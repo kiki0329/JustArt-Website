@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Just Art — Sign In</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #F0F4F8;
+            color: #1E293B;
+            line-height: 1.6;
+        }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; font-family: inherit; border: none; background: none; }
+        input { font-family: inherit; outline: none; border: none; }
+
+        :root {
+            --primary: #1E293B;
+            --secondary: #334155;
+            --accent: #3B82F6;
+            --accent-hover: #2563EB;
+            --accent-light: #DBEAFE;
+            --warm-white: #F1F5F9;
+            --shadow: 0 10px 40px rgba(30, 41, 59, 0.08);
+            --radius: 12px;
+            --transition: 0.35s ease;
+            --border-color: #E2E8F0;
+        }
+
+        .app { max-width: 1440px; margin: 0 auto; padding: 0 24px 60px; }
+
+        .header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 0 16px; border-bottom: 2px solid var(--accent-light);
+            flex-wrap: wrap; gap: 12px 20px;
+        }
+        .logo-wrap { display: flex; align-items: center; gap: 10px; text-decoration: none; }      .logo-img { width: 48px; height: 48px; object-fit: contain; mix-blend-mode: multiply; }
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-family: 'Georgia', serif;
+        }.back-link { font-size: 14px; color: var(--secondary); font-weight: 600; }
+        .back-link:hover { color: var(--accent); }
+
+        .auth-wrapper {
+            display: flex; align-items: center; justify-content: center;
+            min-height: 70vh; padding: 40px 0;
+        }
+        .auth-box {
+            background: #fff; border-radius: var(--radius);
+            padding: 44px 40px; max-width: 420px; width: 100%;
+            box-shadow: var(--shadow); border: 1px solid var(--border-color);
+        }
+        .auth-box .logo-auth { text-align: center; margin-bottom: 26px; }
+        .auth-box .logo-auth h2 { font-size: 30px; letter-spacing: 3px; color: var(--primary); }
+        .auth-box .logo-auth span { color: var(--accent); }
+        .auth-box .logo-auth p { color: var(--secondary); font-style: italic; font-size: 14px; margin-top: 4px; }
+
+        .tab-switch {
+            display: flex; background: var(--warm-white);
+            border-radius: 40px; padding: 4px; margin-bottom: 24px;
+        }
+        .tab-switch button {
+            flex: 1; padding: 10px; border-radius: 40px;
+            font-size: 14px; font-weight: 600; letter-spacing: 0.5px;
+            color: var(--secondary); transition: var(--transition);
+        }
+        .tab-switch button.active { background: var(--primary); color: #fff; }
+
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+
+        label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 4px; margin-top: 16px; }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%; padding: 12px 16px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 15px; background: var(--warm-white); transition: var(--transition);
+        }
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background: #fff;
+        }
+
+        .submit-btn {
+            width: 100%; padding: 14px; background: var(--primary); color: #fff;
+            border-radius: 40px; font-size: 16px; font-weight: 600; letter-spacing: 1px;
+            margin-top: 24px; transition: var(--transition);
+        }
+        .submit-btn:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(59, 130, 246, 0.3); }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .msg-error, .msg-success {
+            font-size: 13px; margin-top: 14px; padding: 10px 14px; border-radius: 8px; display: none;
+        }
+        .msg-error { color: #B91C1C; background: #FEE2E2; }
+        .msg-success { color: #065F46; background: #D1FAE5; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <a href="homepage.html" class="logo-wrap">
+                <img src="logo.png" class="logo-img" alt="Just Art Logo" />
+                <span class="logo-text">Just Art</span>
+            </a>
+            <a href="homepage.html" class="back-link">&larr; Back to Home</a>
+        </header>
+
+        <div class="auth-wrapper">
+            <div class="auth-box">
+                <div class="logo-auth">
+                    <h2>✦ <span>Just</span> Art</h2>
+                    <p>sign in to your collection</p>
+                </div>
+
+                <div class="tab-switch">
+                    <button id="tabSignIn" class="active">Sign In</button>
+                    <button id="tabSignUp">Create Account</button>
+                </div>
+
+                <!-- SIGN IN FORM -->
+                <form id="signInForm" class="auth-form active">
+                    <label for="siEmail">Email</label>
+                    <input type="email" id="siEmail" placeholder="art@collector.com" required />
+
+                    <label for="siPassword">Password</label>
+                    <input type="password" id="siPassword" placeholder="••••••••" required />
+
+                    <button type="submit" class="submit-btn" id="siBtn">Sign In</button>
+                    <div class="msg-error" id="siError"></div>
+                </form>
+
+                <!-- CREATE ACCOUNT FORM -->
+                <form id="signUpForm" class="auth-form">
+                    <label for="suEmail">Email</label>
+                    <input type="email" id="suEmail" placeholder="art@collector.com" required />
+
+                    <label for="suPassword">Password</label>
+                    <input type="password" id="suPassword" placeholder="At least 6 characters" required minlength="6" />
+
+                    <button type="submit" class="submit-btn" id="suBtn">Create Account</button>
+                    <div class="msg-error" id="suError"></div>
+                    <div class="msg-success" id="suSuccess"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         DATABASE — uses the functions exported from db-common.js
+         (signIn / signUp / watchAuth) to interact with the backend API.
+       ============================================================ -->
+    <script type="module">
+        import { signIn, signUp, watchAuth } from './db-common.js';
+
+        // ------------------------------------------------------------
+        // TAB SWITCHING (Sign In <-> Create Account)
+        // ------------------------------------------------------------
+        const tabSignIn = document.getElementById('tabSignIn');
+        const tabSignUp = document.getElementById('tabSignUp');
+        const signInForm = document.getElementById('signInForm');
+        const signUpForm = document.getElementById('signUpForm');
+
+        tabSignIn.addEventListener('click', () => {
+            tabSignIn.classList.add('active');
+            tabSignUp.classList.remove('active');
+            signInForm.classList.add('active');
+            signUpForm.classList.remove('active');
+        });
+        tabSignUp.addEventListener('click', () => {
+            tabSignUp.classList.add('active');
+            tabSignIn.classList.remove('active');
+            signUpForm.classList.add('active');
+            signInForm.classList.remove('active');
+        });
+
+        // ------------------------------------------------------------
+        // If someone is ALREADY signed in and lands on this page,
+        // send them straight back home instead of showing the form.
+        // ------------------------------------------------------------
+        watchAuth((user) => {
+            if (user) {
+                window.location.href = 'homepage.html?login=success';
+            }
+        });
+
+        // ------------------------------------------------------------
+        // SIGN IN — existing users
+        // ------------------------------------------------------------
+        const siError = document.getElementById('siError');
+        const siBtn = document.getElementById('siBtn');
+
+        signInForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            siError.style.display = 'none';
+
+            const email = document.getElementById('siEmail').value.trim();
+            const password = document.getElementById('siPassword').value;
+
+            siBtn.disabled = true;
+            siBtn.textContent = 'Signing in…';
+
+            try {
+                await signIn(email, password);   // <-- calls the function from db-common.js
+                window.location.href = 'homepage.html?login=success';
+            } catch (err) {
+                siError.textContent = friendlyAuthError(err.code);
+                siError.style.display = 'block';
+                siBtn.disabled = false;
+                siBtn.textContent = 'Sign In';
+            }
+        });
+
+        // ------------------------------------------------------------
+        // CREATE ACCOUNT — new users
+        // (signUp() in db-common.js already creates the account)
+        // ------------------------------------------------------------
+        const suError = document.getElementById('suError');
+        const suSuccess = document.getElementById('suSuccess');
+        const suBtn = document.getElementById('suBtn');
+
+        signUpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            suError.style.display = 'none';
+            suSuccess.style.display = 'none';
+
+            const email = document.getElementById('suEmail').value.trim();
+            const password = document.getElementById('suPassword').value;
+
+            suBtn.disabled = true;
+            suBtn.textContent = 'Creating account…';
+
+            try {
+                await signUp(email, password);   // <-- calls the function from db-common.js
+
+                suSuccess.textContent = '✨ Account created! Redirecting…';
+                suSuccess.style.display = 'block';
+
+                setTimeout(() => {
+                    window.location.href = 'homepage.html?login=success';
+                }, 900);
+            } catch (err) {
+                suError.textContent = friendlyAuthError(err.code);
+                suError.style.display = 'block';
+                suBtn.disabled = false;
+                suBtn.textContent = 'Create Account';
+            }
+        });
+
+        // ------------------------------------------------------------
+        // Turn backend auth raw error codes into plain-English messages
+        // ------------------------------------------------------------
+        function friendlyAuthError(code) {
+            const map = {
+                'auth/email-already-in-use': 'That email already has an account — try signing in instead.',
+                'auth/invalid-email': 'That email address doesn\'t look right.',
+                'auth/weak-password': 'Password must be at least 6 characters.',
+                'auth/user-not-found': 'No account found with that email.',
+                'auth/wrong-password': 'Incorrect password.',
+                'auth/invalid-credential': 'Incorrect email or password.',
+                'auth/too-many-requests': 'Too many attempts — please wait a moment and try again.'
+            };
+            return map[code] || 'Something went wrong. Please try again.';
+        }
+    </script>
+</body>
+</html>
