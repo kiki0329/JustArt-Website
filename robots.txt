@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /homepage.html
+Allow: /gallerypage.html
+Disallow: /cartpage.html
+Disallow: /wishlistpage.html
+Disallow: /signin.html
+
+Sitemap: sitemap.xml

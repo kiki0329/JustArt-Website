@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Just Art — Wishlist</title>
+    <title>Your Wishlist — Saved Paintings | Just Art</title>
+    <meta name="description" content="View your saved favourite paintings. Add them to cart or continue browsing the Just Art gallery." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href="wishlistpage.html" />
+    <link rel="icon" href="logo.png" type="image/png" />
+    <meta property="og:title" content="Your Wishlist | Just Art" />
+    <meta property="og:description" content="View your saved favourite paintings at Just Art." />
+    <meta property="og:image" content="logo.png" />
+    <meta name="twitter:card" content="summary" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Georgia', 'Times New Roman', serif; background: #F0F4F8; color: #1E293B; line-height: 1.6; }
@@ -103,27 +111,31 @@
             <div class="header-actions">
                 <div class="search-wrap">
                     <input type="text" id="searchInput" placeholder="Search…" />
-                    <button id="searchBtn">🔍</button>
+                    <button id="searchBtn" aria-label="Search paintings">🔍</button>
                 </div>
-                <button class="icon-btn" onclick="location.href='wishlistpage.html'">
+                <button class="icon-btn" onclick="location.href='wishlistpage.html'" aria-label="View wishlist">
                     ♡ <span class="badge" id="wishlistBadge">0</span>
                 </button>
-                <button class="icon-btn" onclick="location.href='cartpage.html'">
+                <button class="icon-btn" onclick="location.href='cartpage.html'" aria-label="View cart">
                     🛒 <span class="badge" id="cartBadge">0</span>
                 </button>
                 <button class="login-btn" id="loginNavBtn">Sign In</button>
             </div>
         </header>
 
-        <div class="page">
+        <main class="page">
             <div class="section-header">
                 <div>
-                    <h2 class="section-title">Your Wishlist</h2>
+                    <h1 class="section-title">Your Wishlist</h1>
                     <p class="section-sub" id="wishlistSub">Paintings you love</p>
                 </div>
             </div>
             <div id="wishlistContainer"></div>
-        </div>
+        </main>
+
+        <footer style="text-align:center; padding:30px 0 20px; color:#94A3B8; font-size:13px; border-top:1px solid var(--border-color); margin-top:40px;">
+            <p>&copy; 2026 Just Art. All rights reserved. | Original paintings from talented artists worldwide.</p>
+        </footer>
     </div>
 
     <script type="module">

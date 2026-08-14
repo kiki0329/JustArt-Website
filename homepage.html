@@ -4,7 +4,20 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Just Art — Home</title>
+    <title>Just Art — Buy Original Paintings & Fine Art Online</title>
+    <meta name="description" content="Discover and buy original paintings at Just Art. Browse landscapes, portraits, abstract art, and more from talented artists worldwide. Free collection of 200+ curated artworks." />
+    <meta name="keywords" content="buy paintings online, original art, fine art, landscape paintings, portrait art, abstract paintings, art gallery" />
+    <link rel="canonical" href="homepage.html" />
+    <link rel="icon" href="logo.png" type="image/png" />
+    <!-- Open Graph (Social Media Sharing) -->
+    <meta property="og:title" content="Just Art — Buy Original Paintings & Fine Art Online" />
+    <meta property="og:description" content="Discover and buy original paintings from talented artists worldwide. Browse landscapes, portraits, abstract art, and more." />
+    <meta property="og:image" content="logo.png" />
+    <meta property="og:type" content="website" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Just Art — Buy Original Paintings & Fine Art Online" />
+    <meta name="twitter:description" content="Discover and buy original paintings from talented artists worldwide." />
     <style>
         /* ----- RESET & BASE (Blue Theme) ----- */
         * {
@@ -729,19 +742,19 @@
             <div class="header-actions">
                 <div class="search-wrap">
                     <input type="text" id="searchInput" placeholder="Search paintings…" />
-                    <button id="searchBtn">🔍</button>
+                    <button id="searchBtn" aria-label="Search paintings">🔍</button>
                 </div>
-                <button class="icon-btn" onclick="location.href='wishlistpage.html'">
+                <button class="icon-btn" onclick="location.href='wishlistpage.html'" aria-label="View wishlist">
                     ♡ <span class="badge" id="wishlistBadge">0</span>
                 </button>
-                <button class="icon-btn" onclick="location.href='cartpage.html'">
+                <button class="icon-btn" onclick="location.href='cartpage.html'" aria-label="View cart">
                     🛒 <span class="badge" id="cartBadge">0</span>
                 </button>
                 <button class="login-btn" id="loginNavBtn">Sign In</button>
             </div>
         </header>
 
-        <div class="page">
+        <main class="page">
             <section class="hero">
                 <div class="hero-content">
                     <h1>Where <span>Art</span> Finds a Home</h1>
@@ -770,7 +783,11 @@
                 </div>
             </div>
             <div class="product-grid" id="featuredGrid"></div>
-        </div>
+        </main>
+
+        <footer style="text-align:center; padding:30px 0 20px; color:#94A3B8; font-size:13px; border-top:1px solid var(--border-color); margin-top:40px;">
+            <p>&copy; 2026 Just Art. All rights reserved. | Original paintings from talented artists worldwide.</p>
+        </footer>
     </div>
 
     <!-- ============================================================
