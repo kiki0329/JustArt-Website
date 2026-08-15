@@ -1,6 +1,6 @@
 // api/index.js
 // Vercel Serverless Function entry point
-// Wraps the Express app for Vercel's serverless architecture with Cloud MySQL support.
+// Handles all API endpoints & static page routes seamlessly with Cloud MySQL support.
 
 require('dotenv').config();
 const express = require('express');
@@ -11,7 +11,18 @@ const bcrypt = require('bcryptjs');
 
 const app = express();
 
-// Serve static HTML/CSS/JS files from the project root (one level up from /api)
+// Enable CORS & Preflight handling
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
+
+// Serve static HTML/CSS/JS files from the project root
 app.use(express.static(path.join(__dirname, '..')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -150,7 +161,6 @@ async function seedDatabase() {
     }
 }
 
-// Lazy initialization flag
 let dbInitialized = false;
 
 async function ensureDbReady() {
@@ -166,44 +176,18 @@ app.use(async (req, res, next) => {
     try {
         await ensureDbReady();
     } catch (err) {
-        console.error('Database connection/init warning:', err.message);
+        console.error('Database connection warning:', err.message);
     }
     next();
 });
 
 // ------------------------------------------------------------
-// HTML Page Routes
+// API Router (handles both /api/... and /... prefixes)
 // ------------------------------------------------------------
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'homepage.html'));
-});
-
-app.get('/homepage.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'homepage.html'));
-});
-
-app.get('/gallerypage.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'gallerypage.html'));
-});
-
-app.get('/cartpage.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'cartpage.html'));
-});
-
-app.get('/wishlistpage.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'wishlistpage.html'));
-});
-
-app.get('/signin.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'signin.html'));
-});
-
-// ------------------------------------------------------------
-// API Endpoints
-// ------------------------------------------------------------
+const apiRouter = express.Router();
 
 // Sign Up
-app.post('/api/auth/signup', async (req, res) => {
+apiRouter.post('/auth/signup', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required', code: 'auth/invalid-email' });
@@ -233,7 +217,7 @@ app.post('/api/auth/signup', async (req, res) => {
 });
 
 // Sign In
-app.post('/api/auth/signin', async (req, res) => {
+apiRouter.post('/auth/signin', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required', code: 'auth/invalid-credential' });
@@ -262,7 +246,7 @@ app.post('/api/auth/signin', async (req, res) => {
 });
 
 // Sign Out
-app.post('/api/auth/logout', (req, res) => {
+apiRouter.post('/auth/logout', (req, res) => {
     if (req.session) {
         req.session.destroy((err) => {
             if (err) {
@@ -279,12 +263,12 @@ app.post('/api/auth/logout', (req, res) => {
 });
 
 // Check Session / Current User
-app.get('/api/auth/me', (req, res) => {
+apiRouter.get('/auth/me', (req, res) => {
     return res.json({ user: req.session.user || null });
 });
 
 // Load User Data (Cart & Wishlist)
-app.get('/api/user/data', async (req, res) => {
+apiRouter.get('/user/data', async (req, res) => {
     if (!req.session.user) {
         return res.json({ cart: [], wishlist: [] });
     }
@@ -317,7 +301,7 @@ app.get('/api/user/data', async (req, res) => {
 });
 
 // Save User Data (Cart & Wishlist)
-app.post('/api/user/data', async (req, res) => {
+apiRouter.post('/user/data', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized user action' });
     }
@@ -363,8 +347,8 @@ app.post('/api/user/data', async (req, res) => {
     }
 });
 
-// GET /api/cart - Fetch the user's cart
-app.get('/api/cart', async (req, res) => {
+// GET /cart - Fetch user cart
+apiRouter.get('/cart', async (req, res) => {
     if (!req.session.user) {
         return res.json([]);
     }
@@ -386,8 +370,8 @@ app.get('/api/cart', async (req, res) => {
     }
 });
 
-// POST /api/cart - Add a painting to the cart
-app.post('/api/cart', async (req, res) => {
+// POST /cart - Add painting to cart
+apiRouter.post('/cart', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -412,8 +396,8 @@ app.post('/api/cart', async (req, res) => {
     }
 });
 
-// PUT /api/cart/:itemId - Update item quantity in the cart
-app.put('/api/cart/:itemId', async (req, res) => {
+// PUT /cart/:itemId - Update item quantity
+apiRouter.put('/cart/:itemId', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -435,8 +419,8 @@ app.put('/api/cart/:itemId', async (req, res) => {
     }
 });
 
-// DELETE /api/cart/:itemId - Remove item from the cart
-app.delete('/api/cart/:itemId', async (req, res) => {
+// DELETE /cart/:itemId - Remove item from cart
+apiRouter.delete('/cart/:itemId', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -454,8 +438,8 @@ app.delete('/api/cart/:itemId', async (req, res) => {
     }
 });
 
-// DELETE /api/cart - Clear user's cart
-app.delete('/api/cart', async (req, res) => {
+// DELETE /cart - Clear user cart
+apiRouter.delete('/cart', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -469,8 +453,8 @@ app.delete('/api/cart', async (req, res) => {
     }
 });
 
-// GET /api/wishlist - Fetch user's wishlist
-app.get('/api/wishlist', async (req, res) => {
+// GET /wishlist - Fetch user wishlist
+apiRouter.get('/wishlist', async (req, res) => {
     if (!req.session.user) {
         return res.json([]);
     }
@@ -490,8 +474,8 @@ app.get('/api/wishlist', async (req, res) => {
     }
 });
 
-// POST /api/wishlist - Add painting to wishlist
-app.post('/api/wishlist', async (req, res) => {
+// POST /wishlist - Add painting to wishlist
+apiRouter.post('/wishlist', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -516,8 +500,8 @@ app.post('/api/wishlist', async (req, res) => {
     }
 });
 
-// DELETE /api/wishlist/:productId - Remove painting from wishlist
-app.delete('/api/wishlist/:productId', async (req, res) => {
+// DELETE /wishlist/:productId - Remove painting from wishlist
+apiRouter.delete('/wishlist/:productId', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -533,6 +517,37 @@ app.delete('/api/wishlist/:productId', async (req, res) => {
         console.error('Error removing from wishlist:', err);
         return res.status(500).json({ error: 'Server error removing from wishlist' });
     }
+});
+
+// Mount the API Router under BOTH /api and / to handle all Vercel route patterns
+app.use('/api', apiRouter);
+app.use('/', apiRouter);
+
+// ------------------------------------------------------------
+// HTML Page Routes
+// ------------------------------------------------------------
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'homepage.html'));
+});
+
+app.get('/homepage.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'homepage.html'));
+});
+
+app.get('/gallerypage.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'gallerypage.html'));
+});
+
+app.get('/cartpage.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'cartpage.html'));
+});
+
+app.get('/wishlistpage.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'wishlistpage.html'));
+});
+
+app.get('/signin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'signin.html'));
 });
 
 // Export the Express app for Vercel serverless
