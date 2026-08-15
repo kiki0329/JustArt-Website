@@ -105,10 +105,30 @@ async function initializeDatabase() {
             await pool.query('ALTER TABLE paintings MODIFY image_url MEDIUMTEXT NOT NULL;');
         } catch (e) {}
 
-        // Remove old dummy internet paintings with picsum links so only user-uploaded art is shown
+        // Remove old dummy internet paintings with picsum links so only real art is shown
         try {
             await pool.query("DELETE FROM paintings WHERE image_url LIKE '%picsum.photos%'");
         } catch (e) {}
+
+        // Check if paintings table is empty; if so, populate with real artworks
+        const [existingPaintings] = await pool.query('SELECT COUNT(*) as cnt FROM paintings');
+        if (existingPaintings[0].cnt === 0) {
+            const seedItems = [
+                [1, 'Whispers of Dawn', 549, 'whispers_of_dawn.jpg', 1],
+                [2, 'Eternal Silence', 799, 'eternal_silence.jpg', 1],
+                [3, 'Crimson Horizon', 649, 'crimson_horizon.jpg', 1],
+                [4, 'Dancing Shadows', 729, 'dancing_shadows.jpg', 1],
+                [5, 'Golden Afternoon', 499, 'golden_afternoon.jpg', 1],
+                [6, 'Midnight Reverie', 879, 'midnight_reverie.jpg', 1]
+            ];
+            for (const item of seedItems) {
+                await pool.query(
+                    'INSERT IGNORE INTO paintings (id, title, artist, category, price, image_url, featured) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                    [item[0], item[1], '', 'Original', item[2], item[3], item[4]]
+                );
+            }
+            console.log('Seeded 6 real paintings into MySQL database.');
+        }
 
         console.log('Database tables verified/created successfully.');
     } catch (err) {

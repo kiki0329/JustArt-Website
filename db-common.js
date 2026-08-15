@@ -52,6 +52,15 @@ export function watchAuth(callback) {
     callback(cachedUser);
 }
 
+export const defaultPaintings = [
+    { id: 1, title: 'Whispers of Dawn', price: 549, image: 'whispers_of_dawn.jpg', featured: true },
+    { id: 2, title: 'Eternal Silence', price: 799, image: 'eternal_silence.jpg', featured: true },
+    { id: 3, title: 'Crimson Horizon', price: 649, image: 'crimson_horizon.jpg', featured: true },
+    { id: 4, title: 'Dancing Shadows', price: 729, image: 'dancing_shadows.jpg', featured: true },
+    { id: 5, title: 'Golden Afternoon', price: 499, image: 'golden_afternoon.jpg', featured: true },
+    { id: 6, title: 'Midnight Reverie', price: 879, image: 'midnight_reverie.jpg', featured: true }
+];
+
 // ============================================================
 // Paintings Management (Dynamic API with MySQL)
 // ============================================================
@@ -71,10 +80,13 @@ export async function fetchPaintings(options = {}) {
             throw new Error(`Failed to fetch paintings: ${res.status}`);
         }
         const data = await res.json();
-        return Array.isArray(data) ? data : [];
+        if (Array.isArray(data) && data.length > 0) {
+            return data;
+        }
+        return defaultPaintings;
     } catch (err) {
-        console.warn('Error fetching paintings:', err.message);
-        return [];
+        console.warn('Error fetching paintings, using local default:', err.message);
+        return defaultPaintings;
     }
 }
 
