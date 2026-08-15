@@ -5,13 +5,42 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Just Art — Buy Original Paintings & Fine Art Online</title>
-    <meta name="description" content="Discover and buy original paintings at Just Art. Browse landscapes, portraits, abstract art, and more from talented artists worldwide. Free collection of 200+ curated artworks." />
-    <meta name="keywords" content="buy paintings online, original art, fine art, landscape paintings, portrait art, abstract paintings, art gallery" />
+    <meta name="description"
+        content="Discover and buy original paintings at Just Art. Browse landscapes, portraits, abstract art, and more from talented artists worldwide. Free collection of 200+ curated artworks." />
+    <meta name="keywords"
+        content="buy paintings online, original art, fine art, landscape paintings, portrait art, abstract paintings, art gallery" />
     <link rel="canonical" href="homepage.html" />
     <link rel="icon" href="logo.png" type="image/png" />
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Just Art",
+      "description": "Discover and buy original paintings at Just Art. Browse landscapes, portraits, abstract art, and more from talented artists worldwide.",
+      "url": "homepage.html",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "gallerypage.html?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Just Art",
+      "description": "Online art gallery featuring original paintings from talented artists worldwide.",
+      "url": "homepage.html",
+      "logo": "logo.png",
+      "sameAs": []
+    }
+    </script>
     <!-- Open Graph (Social Media Sharing) -->
     <meta property="og:title" content="Just Art — Buy Original Paintings & Fine Art Online" />
-    <meta property="og:description" content="Discover and buy original paintings from talented artists worldwide. Browse landscapes, portraits, abstract art, and more." />
+    <meta property="og:description"
+        content="Discover and buy original paintings from talented artists worldwide. Browse landscapes, portraits, abstract art, and more." />
     <meta property="og:image" content="logo.png" />
     <meta property="og:type" content="website" />
     <!-- Twitter Card -->
@@ -785,8 +814,17 @@
             <div class="product-grid" id="featuredGrid"></div>
         </main>
 
-        <footer style="text-align:center; padding:30px 0 20px; color:#94A3B8; font-size:13px; border-top:1px solid var(--border-color); margin-top:40px;">
+        <footer
+            style="text-align:center; padding:30px 0 20px; color:#94A3B8; font-size:13px; border-top:1px solid var(--border-color); margin-top:40px;">
             <p>&copy; 2026 Just Art. All rights reserved. | Original paintings from talented artists worldwide.</p>
+            <nav aria-label="Footer navigation"
+                style="margin-top:12px;display:flex;justify-content:center;gap:18px;font-size:13px;">
+                <a href="homepage.html" style="color:#64748B;transition:color 0.3s;">Home</a>
+                <a href="gallerypage.html" style="color:#64748B;transition:color 0.3s;">Gallery</a>
+                <a href="cartpage.html" style="color:#64748B;transition:color 0.3s;">Cart</a>
+                <a href="wishlistpage.html" style="color:#64748B;transition:color 0.3s;">Wishlist</a>
+                <a href="signin.html" style="color:#64748B;transition:color 0.3s;">Sign In</a>
+            </nav>
         </footer>
     </div>
 
@@ -803,32 +841,32 @@
         //  DATA
         // ============================================================
         const paintings = [
-            { id: 1, title: 'Whispers of Dawn', artist: 'Elena Voss', category: 'Landscape', price: 85000, image: 'https://picsum.photos/seed/dawn_blue/400/500', featured: true },
-            { id: 2, title: 'Eternal Silence', artist: 'Marcus Reed', category: 'Portrait', price: 120000, image: 'https://picsum.photos/seed/silence_blue/400/500', featured: true },
-            { id: 3, title: 'Crimson Horizon', artist: 'Sophia Chen', category: 'Abstract', price: 95000, image: 'https://picsum.photos/seed/crimson_blue/400/500', featured: true },
-            { id: 4, title: 'Dancing Shadows', artist: 'Oliver Stone', category: 'Expressionism', price: 110000, image: 'https://picsum.photos/seed/shadow_blue/400/500', featured: true },
-            { id: 5, title: 'Golden Afternoon', artist: 'Clara Belle', category: 'Impressionism', price: 78000, image: 'https://picsum.photos/seed/golden_blue/400/500', featured: false },
-            { id: 6, title: 'Midnight Reverie', artist: 'Julian Cross', category: 'Surrealism', price: 130000, image: 'https://picsum.photos/seed/midnight_blue/400/500', featured: false },
-            { id: 7, title: 'Ocean\'s Whisper', artist: 'Nina Torres', category: 'Seascape', price: 92000, image: 'https://picsum.photos/seed/ocean_blue/400/500', featured: false },
-            { id: 8, title: 'Autumn Melody', artist: 'Henry Wright', category: 'Landscape', price: 68000, image: 'https://picsum.photos/seed/autumn_blue/400/500', featured: false },
-            { id: 9, title: 'Celestial Dreams', artist: 'Iris Moon', category: 'Abstract', price: 105000, image: 'https://picsum.photos/seed/celestial_blue/400/500', featured: false },
-            { id: 10, title: 'Whispering Pines', artist: 'David Grey', category: 'Landscape', price: 75000, image: 'https://picsum.photos/seed/pines_blue/400/500', featured: false },
-            { id: 11, title: 'Silent Revolution', artist: 'Zara Khan', category: 'Contemporary', price: 145000, image: 'https://picsum.photos/seed/revolution_blue/400/500', featured: false },
-            { id: 12, title: 'Ethereal Bloom', artist: 'Lily Rose', category: 'Floral', price: 82000, image: 'https://picsum.photos/seed/bloom_blue/400/500', featured: false },
-            { id: 13, title: 'Urban Solitude', artist: 'Arjun Mehta', category: 'Contemporary', price: 99000, image: 'https://picsum.photos/seed/urban_blue/400/500', featured: false },
-            { id: 14, title: 'Mystic Gaze', artist: 'Priya Sharma', category: 'Portrait', price: 135000, image: 'https://picsum.photos/seed/mystic_blue/400/500', featured: false },
-            { id: 15, title: 'Rustic Charms', artist: 'Ananya Reddy', category: 'Impressionism', price: 88000, image: 'https://picsum.photos/seed/rustic_blue/400/500', featured: false },
-            { id: 16, title: 'Neon Dreams', artist: 'Vikram Seth', category: 'Abstract', price: 150000, image: 'https://picsum.photos/seed/neon_blue/400/500', featured: false },
-            { id: 17, title: 'Serene Shores', artist: 'Meera Nair', category: 'Seascape', price: 72000, image: 'https://picsum.photos/seed/serene_blue/400/500', featured: false },
-            { id: 18, title: 'Blossom Trail', artist: 'Ravi Verma', category: 'Floral', price: 112000, image: 'https://picsum.photos/seed/blossom_blue/400/500', featured: false },
-            { id: 19, title: 'Fading Echoes', artist: 'Sana Khan', category: 'Expressionism', price: 97000, image: 'https://picsum.photos/seed/echoes_blue/400/500', featured: false },
-            { id: 20, title: 'Tranquil Peaks', artist: 'Aisha Kapoor', category: 'Landscape', price: 83000, image: 'https://picsum.photos/seed/peaks_blue/400/500', featured: false },
-            { id: 21, title: 'Whimsical Forest', artist: 'Kabir Singh', category: 'Surrealism', price: 125000, image: 'https://picsum.photos/seed/forest_blue/400/500', featured: false },
-            { id: 22, title: 'Timeless Grace', artist: 'Lakshmi Menon', category: 'Portrait', price: 140000, image: 'https://picsum.photos/seed/grace_blue/400/500', featured: false },
-            { id: 23, title: 'Modern Muse', artist: 'Rahul Khanna', category: 'Contemporary', price: 108000, image: 'https://picsum.photos/seed/muse_blue/400/500', featured: false },
-            { id: 24, title: 'Golden Horizon', artist: 'Maya Patel', category: 'Impressionism', price: 91000, image: 'https://picsum.photos/seed/horizon_blue/400/500', featured: false },
-            { id: 25, title: 'Abstract Reality', artist: 'Arnav Bose', category: 'Abstract', price: 160000, image: 'https://picsum.photos/seed/reality_blue/400/500', featured: false },
-            { id: 26, title: 'Mountain Echo', artist: 'Neha Gupta', category: 'Landscape', price: 79000, image: 'https://picsum.photos/seed/mountain_blue/400/500', featured: false }
+            { id: 1, title: 'Whispers of Dawn', artist: 'Elena Voss', category: 'Landscape', price: 549, image: 'https://picsum.photos/seed/dawn_blue/400/500', featured: true },
+            { id: 2, title: 'Eternal Silence', artist: 'Marcus Reed', category: 'Portrait', price: 799, image: 'https://picsum.photos/seed/silence_blue/400/500', featured: true },
+            { id: 3, title: 'Crimson Horizon', artist: 'Sophia Chen', category: 'Abstract', price: 649, image: 'https://picsum.photos/seed/crimson_blue/400/500', featured: true },
+            { id: 4, title: 'Dancing Shadows', artist: 'Oliver Stone', category: 'Expressionism', price: 729, image: 'https://picsum.photos/seed/shadow_blue/400/500', featured: true },
+            { id: 5, title: 'Golden Afternoon', artist: 'Clara Belle', category: 'Impressionism', price: 499, image: 'https://picsum.photos/seed/golden_blue/400/500', featured: false },
+            { id: 6, title: 'Midnight Reverie', artist: 'Julian Cross', category: 'Surrealism', price: 879, image: 'https://picsum.photos/seed/midnight_blue/400/500', featured: false },
+            { id: 7, title: 'Ocean\'s Whisper', artist: 'Nina Torres', category: 'Seascape', price: 599, image: 'https://picsum.photos/seed/ocean_blue/400/500', featured: false },
+            { id: 8, title: 'Autumn Melody', artist: 'Henry Wright', category: 'Landscape', price: 399, image: 'https://picsum.photos/seed/autumn_blue/400/500', featured: false },
+            { id: 9, title: 'Celestial Dreams', artist: 'Iris Moon', category: 'Abstract', price: 699, image: 'https://picsum.photos/seed/celestial_blue/400/500', featured: false },
+            { id: 10, title: 'Whispering Pines', artist: 'David Grey', category: 'Landscape', price: 479, image: 'https://picsum.photos/seed/pines_blue/400/500', featured: false },
+            { id: 11, title: 'Silent Revolution', artist: 'Zara Khan', category: 'Contemporary', price: 949, image: 'https://picsum.photos/seed/revolution_blue/400/500', featured: false },
+            { id: 12, title: 'Ethereal Bloom', artist: 'Lily Rose', category: 'Floral', price: 529, image: 'https://picsum.photos/seed/bloom_blue/400/500', featured: false },
+            { id: 13, title: 'Urban Solitude', artist: 'Arjun Mehta', category: 'Contemporary', price: 659, image: 'https://picsum.photos/seed/urban_blue/400/500', featured: false },
+            { id: 14, title: 'Mystic Gaze', artist: 'Priya Sharma', category: 'Portrait', price: 899, image: 'https://picsum.photos/seed/mystic_blue/400/500', featured: false },
+            { id: 15, title: 'Rustic Charms', artist: 'Ananya Reddy', category: 'Impressionism', price: 569, image: 'https://picsum.photos/seed/rustic_blue/400/500', featured: false },
+            { id: 16, title: 'Neon Dreams', artist: 'Vikram Seth', category: 'Abstract', price: 999, image: 'https://picsum.photos/seed/neon_blue/400/500', featured: false },
+            { id: 17, title: 'Serene Shores', artist: 'Meera Nair', category: 'Seascape', price: 449, image: 'https://picsum.photos/seed/serene_blue/400/500', featured: false },
+            { id: 18, title: 'Blossom Trail', artist: 'Ravi Verma', category: 'Floral', price: 749, image: 'https://picsum.photos/seed/blossom_blue/400/500', featured: false },
+            { id: 19, title: 'Fading Echoes', artist: 'Sana Khan', category: 'Expressionism', price: 629, image: 'https://picsum.photos/seed/echoes_blue/400/500', featured: false },
+            { id: 20, title: 'Tranquil Peaks', artist: 'Aisha Kapoor', category: 'Landscape', price: 539, image: 'https://picsum.photos/seed/peaks_blue/400/500', featured: false },
+            { id: 21, title: 'Whimsical Forest', artist: 'Kabir Singh', category: 'Surrealism', price: 829, image: 'https://picsum.photos/seed/forest_blue/400/500', featured: false },
+            { id: 22, title: 'Timeless Grace', artist: 'Lakshmi Menon', category: 'Portrait', price: 929, image: 'https://picsum.photos/seed/grace_blue/400/500', featured: false },
+            { id: 23, title: 'Modern Muse', artist: 'Rahul Khanna', category: 'Contemporary', price: 719, image: 'https://picsum.photos/seed/muse_blue/400/500', featured: false },
+            { id: 24, title: 'Golden Horizon', artist: 'Maya Patel', category: 'Impressionism', price: 589, image: 'https://picsum.photos/seed/horizon_blue/400/500', featured: false },
+            { id: 25, title: 'Abstract Reality', artist: 'Arnav Bose', category: 'Abstract', price: 979, image: 'https://picsum.photos/seed/reality_blue/400/500', featured: false },
+            { id: 26, title: 'Mountain Echo', artist: 'Neha Gupta', category: 'Landscape', price: 349, image: 'https://picsum.photos/seed/mountain_blue/400/500', featured: false }
         ];
 
         const categories = [...new Set(paintings.map(p => p.category))];

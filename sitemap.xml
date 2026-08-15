@@ -2,12 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>homepage.html</loc>
+        <lastmod>2026-08-15</lastmod>
         <priority>1.0</priority>
         <changefreq>weekly</changefreq>
     </url>
     <url>
         <loc>gallerypage.html</loc>
+        <lastmod>2026-08-15</lastmod>
         <priority>0.9</priority>
         <changefreq>weekly</changefreq>
+    </url>
+    <url>
+        <loc>signin.html</loc>
+        <lastmod>2026-08-15</lastmod>
+        <priority>0.5</priority>
+        <changefreq>monthly</changefreq>
     </url>
 </urlset>
