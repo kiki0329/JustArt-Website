@@ -1,6 +1,6 @@
 // api/index.js
 // Vercel Serverless Function entry point
-// Handles all API endpoints & static page routes seamlessly with Cloud MySQL support.
+// Handles all API endpoints (Auth, Cart, Wishlist, Paintings CRUD) & static page routes seamlessly with Cloud MySQL support.
 
 require('dotenv').config();
 const express = require('express');
@@ -24,8 +24,8 @@ app.use((req, res, next) => {
 
 // Serve static HTML/CSS/JS files from the project root
 app.use(express.static(path.join(__dirname, '..')));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
 // Express session setup
 app.use(session({
@@ -56,32 +56,32 @@ const pool = mysql.createPool({
 
 // Paintings list for seeding database
 const initialPaintings = [
-    { id: 1, title: 'Whispers of Dawn', artist: 'Elena Voss', category: 'Landscape', price: 85000, image: 'https://picsum.photos/seed/dawn_blue/400/500', featured: true },
-    { id: 2, title: 'Eternal Silence', artist: 'Marcus Reed', category: 'Portrait', price: 120000, image: 'https://picsum.photos/seed/silence_blue/400/500', featured: true },
-    { id: 3, title: 'Crimson Horizon', artist: 'Sophia Chen', category: 'Abstract', price: 95000, image: 'https://picsum.photos/seed/crimson_blue/400/500', featured: true },
-    { id: 4, title: 'Dancing Shadows', artist: 'Oliver Stone', category: 'Expressionism', price: 110000, image: 'https://picsum.photos/seed/shadow_blue/400/500', featured: true },
-    { id: 5, title: 'Golden Afternoon', artist: 'Clara Belle', category: 'Impressionism', price: 78000, image: 'https://picsum.photos/seed/golden_blue/400/500', featured: false },
-    { id: 6, title: 'Midnight Reverie', artist: 'Julian Cross', category: 'Surrealism', price: 130000, image: 'https://picsum.photos/seed/midnight_blue/400/500', featured: false },
-    { id: 7, title: 'Ocean\'s Whisper', artist: 'Nina Torres', category: 'Seascape', price: 92000, image: 'https://picsum.photos/seed/ocean_blue/400/500', featured: false },
-    { id: 8, title: 'Autumn Melody', artist: 'Henry Wright', category: 'Landscape', price: 68000, image: 'https://picsum.photos/seed/autumn_blue/400/500', featured: false },
-    { id: 9, title: 'Celestial Dreams', artist: 'Iris Moon', category: 'Abstract', price: 105000, image: 'https://picsum.photos/seed/celestial_blue/400/500', featured: false },
-    { id: 10, title: 'Whispering Pines', artist: 'David Grey', category: 'Landscape', price: 75000, image: 'https://picsum.photos/seed/pines_blue/400/500', featured: false },
-    { id: 11, title: 'Silent Revolution', artist: 'Zara Khan', category: 'Contemporary', price: 145000, image: 'https://picsum.photos/seed/revolution_blue/400/500', featured: false },
-    { id: 12, title: 'Ethereal Bloom', artist: 'Lily Rose', category: 'Floral', price: 82000, image: 'https://picsum.photos/seed/bloom_blue/400/500', featured: false },
-    { id: 13, title: 'Urban Solitude', artist: 'Arjun Mehta', category: 'Contemporary', price: 99000, image: 'https://picsum.photos/seed/urban_blue/400/500', featured: false },
-    { id: 14, title: 'Mystic Gaze', artist: 'Priya Sharma', category: 'Portrait', price: 135000, image: 'https://picsum.photos/seed/mystic_blue/400/500', featured: false },
-    { id: 15, title: 'Rustic Charms', artist: 'Ananya Reddy', category: 'Impressionism', price: 88000, image: 'https://picsum.photos/seed/rustic_blue/400/500', featured: false },
-    { id: 16, title: 'Neon Dreams', artist: 'Vikram Seth', category: 'Abstract', price: 150000, image: 'https://picsum.photos/seed/neon_blue/400/500', featured: false },
-    { id: 17, title: 'Serene Shores', artist: 'Meera Nair', category: 'Seascape', price: 72000, image: 'https://picsum.photos/seed/serene_blue/400/500', featured: false },
-    { id: 18, title: 'Blossom Trail', artist: 'Ravi Verma', category: 'Floral', price: 112000, image: 'https://picsum.photos/seed/blossom_blue/400/500', featured: false },
-    { id: 19, title: 'Fading Echoes', artist: 'Sana Khan', category: 'Expressionism', price: 97000, image: 'https://picsum.photos/seed/echoes_blue/400/500', featured: false },
-    { id: 20, title: 'Tranquil Peaks', artist: 'Aisha Kapoor', category: 'Landscape', price: 83000, image: 'https://picsum.photos/seed/peaks_blue/400/500', featured: false },
-    { id: 21, title: 'Whimsical Forest', artist: 'Kabir Singh', category: 'Surrealism', price: 125000, image: 'https://picsum.photos/seed/forest_blue/400/500', featured: false },
-    { id: 22, title: 'Timeless Grace', artist: 'Lakshmi Menon', category: 'Portrait', price: 140000, image: 'https://picsum.photos/seed/grace_blue/400/500', featured: false },
-    { id: 23, title: 'Modern Muse', artist: 'Rahul Khanna', category: 'Contemporary', price: 108000, image: 'https://picsum.photos/seed/muse_blue/400/500', featured: false },
-    { id: 24, title: 'Golden Horizon', artist: 'Maya Patel', category: 'Impressionism', price: 91000, image: 'https://picsum.photos/seed/horizon_blue/400/500', featured: false },
-    { id: 25, title: 'Abstract Reality', artist: 'Arnav Bose', category: 'Abstract', price: 160000, image: 'https://picsum.photos/seed/reality_blue/400/500', featured: false },
-    { id: 26, title: 'Mountain Echo', artist: 'Neha Gupta', category: 'Landscape', price: 79000, image: 'https://picsum.photos/seed/mountain_blue/400/500', featured: false }
+    { id: 1, title: 'Whispers of Dawn', artist: 'Elena Voss', category: 'Landscape', price: 549, image: 'https://picsum.photos/seed/dawn_blue/400/500', featured: true },
+    { id: 2, title: 'Eternal Silence', artist: 'Marcus Reed', category: 'Portrait', price: 799, image: 'https://picsum.photos/seed/silence_blue/400/500', featured: true },
+    { id: 3, title: 'Crimson Horizon', artist: 'Sophia Chen', category: 'Abstract', price: 649, image: 'https://picsum.photos/seed/crimson_blue/400/500', featured: true },
+    { id: 4, title: 'Dancing Shadows', artist: 'Oliver Stone', category: 'Expressionism', price: 729, image: 'https://picsum.photos/seed/shadow_blue/400/500', featured: true },
+    { id: 5, title: 'Golden Afternoon', artist: 'Clara Belle', category: 'Impressionism', price: 499, image: 'https://picsum.photos/seed/golden_blue/400/500', featured: false },
+    { id: 6, title: 'Midnight Reverie', artist: 'Julian Cross', category: 'Surrealism', price: 879, image: 'https://picsum.photos/seed/midnight_blue/400/500', featured: false },
+    { id: 7, title: 'Ocean\'s Whisper', artist: 'Nina Torres', category: 'Seascape', price: 599, image: 'https://picsum.photos/seed/ocean_blue/400/500', featured: false },
+    { id: 8, title: 'Autumn Melody', artist: 'Henry Wright', category: 'Landscape', price: 399, image: 'https://picsum.photos/seed/autumn_blue/400/500', featured: false },
+    { id: 9, title: 'Celestial Dreams', artist: 'Iris Moon', category: 'Abstract', price: 699, image: 'https://picsum.photos/seed/celestial_blue/400/500', featured: false },
+    { id: 10, title: 'Whispering Pines', artist: 'David Grey', category: 'Landscape', price: 479, image: 'https://picsum.photos/seed/pines_blue/400/500', featured: false },
+    { id: 11, title: 'Silent Revolution', artist: 'Zara Khan', category: 'Contemporary', price: 949, image: 'https://picsum.photos/seed/revolution_blue/400/500', featured: false },
+    { id: 12, title: 'Ethereal Bloom', artist: 'Lily Rose', category: 'Floral', price: 529, image: 'https://picsum.photos/seed/bloom_blue/400/500', featured: false },
+    { id: 13, title: 'Urban Solitude', artist: 'Arjun Mehta', category: 'Contemporary', price: 659, image: 'https://picsum.photos/seed/urban_blue/400/500', featured: false },
+    { id: 14, title: 'Mystic Gaze', artist: 'Priya Sharma', category: 'Portrait', price: 899, image: 'https://picsum.photos/seed/mystic_blue/400/500', featured: false },
+    { id: 15, title: 'Rustic Charms', artist: 'Ananya Reddy', category: 'Impressionism', price: 569, image: 'https://picsum.photos/seed/rustic_blue/400/500', featured: false },
+    { id: 16, title: 'Neon Dreams', artist: 'Vikram Seth', category: 'Abstract', price: 999, image: 'https://picsum.photos/seed/neon_blue/400/500', featured: false },
+    { id: 17, title: 'Serene Shores', artist: 'Meera Nair', category: 'Seascape', price: 449, image: 'https://picsum.photos/seed/serene_blue/400/500', featured: false },
+    { id: 18, title: 'Blossom Trail', artist: 'Ravi Verma', category: 'Floral', price: 749, image: 'https://picsum.photos/seed/blossom_blue/400/500', featured: false },
+    { id: 19, title: 'Fading Echoes', artist: 'Sana Khan', category: 'Expressionism', price: 629, image: 'https://picsum.photos/seed/echoes_blue/400/500', featured: false },
+    { id: 20, title: 'Tranquil Peaks', artist: 'Aisha Kapoor', category: 'Landscape', price: 539, image: 'https://picsum.photos/seed/peaks_blue/400/500', featured: false },
+    { id: 21, title: 'Whimsical Forest', artist: 'Kabir Singh', category: 'Surrealism', price: 829, image: 'https://picsum.photos/seed/forest_blue/400/500', featured: false },
+    { id: 22, title: 'Timeless Grace', artist: 'Lakshmi Menon', category: 'Portrait', price: 929, image: 'https://picsum.photos/seed/grace_blue/400/500', featured: false },
+    { id: 23, title: 'Modern Muse', artist: 'Rahul Khanna', category: 'Contemporary', price: 719, image: 'https://picsum.photos/seed/muse_blue/400/500', featured: false },
+    { id: 24, title: 'Golden Horizon', artist: 'Maya Patel', category: 'Impressionism', price: 589, image: 'https://picsum.photos/seed/horizon_blue/400/500', featured: false },
+    { id: 25, title: 'Abstract Reality', artist: 'Arnav Bose', category: 'Abstract', price: 979, image: 'https://picsum.photos/seed/reality_blue/400/500', featured: false },
+    { id: 26, title: 'Mountain Echo', artist: 'Neha Gupta', category: 'Landscape', price: 349, image: 'https://picsum.photos/seed/mountain_blue/400/500', featured: false }
 ];
 
 // Automatically create database and tables if they don't exist
@@ -97,12 +97,12 @@ async function initializeDatabase() {
         `;
         const createPaintingsTable = `
             CREATE TABLE IF NOT EXISTS paintings (
-                id INT PRIMARY KEY,
+                id INT PRIMARY KEY AUTO_INCREMENT,
                 title VARCHAR(255) NOT NULL,
                 artist VARCHAR(255) NOT NULL,
                 category VARCHAR(255) NOT NULL,
                 price DECIMAL(10, 2) NOT NULL,
-                image_url VARCHAR(255) NOT NULL,
+                image_url MEDIUMTEXT NOT NULL,
                 featured TINYINT DEFAULT 0
             ) ENGINE=InnoDB;
         `;
@@ -134,6 +134,14 @@ async function initializeDatabase() {
         await pool.query(createPaintingsTable);
         await pool.query(createCartItemsTable);
         await pool.query(createWishlistItemsTable);
+
+        // Ensure image_url column is MEDIUMTEXT to hold base64 image data
+        try {
+            await pool.query('ALTER TABLE paintings MODIFY image_url MEDIUMTEXT NOT NULL;');
+        } catch (e) {
+            // Already modified or not needed
+        }
+
         console.log('Database tables verified/created successfully.');
     } catch (err) {
         console.error('Error verifying/creating database tables:', err.message);
@@ -154,7 +162,7 @@ async function seedDatabase() {
             }
             console.log('Seeding completed successfully!');
         } else {
-            console.log(`Database already contains ${rows[0].count} paintings.`);
+            console.log(`Database contains ${rows[0].count} paintings.`);
         }
     } catch (err) {
         console.error('Error seeding paintings table:', err.message);
@@ -185,6 +193,157 @@ app.use(async (req, res, next) => {
 // API Router (handles both /api/... and /... prefixes)
 // ------------------------------------------------------------
 const apiRouter = express.Router();
+
+// ============================================================
+// Paintings CRUD Endpoints
+// ============================================================
+
+// GET /api/paintings - Fetch all paintings from MySQL
+apiRouter.get('/paintings', async (req, res) => {
+    try {
+        const { category, featured } = req.query;
+        let query = 'SELECT * FROM paintings';
+        const params = [];
+        const conditions = [];
+
+        if (category && category !== 'All' && category !== 'all') {
+            conditions.push('category = ?');
+            params.push(category);
+        }
+        if (featured === 'true' || featured === '1') {
+            conditions.push('featured = 1');
+        }
+
+        if (conditions.length > 0) {
+            query += ' WHERE ' + conditions.join(' AND ');
+        }
+        query += ' ORDER BY id ASC';
+
+        const [rows] = await pool.query(query, params);
+        const formatted = rows.map(p => ({
+            id: Number(p.id),
+            title: p.title,
+            artist: p.artist,
+            category: p.category,
+            price: Number(p.price),
+            image: p.image_url,
+            featured: Boolean(p.featured)
+        }));
+        return res.json(formatted);
+    } catch (err) {
+        console.error('Error fetching paintings:', err);
+        return res.status(500).json({ error: 'Server error fetching paintings' });
+    }
+});
+
+// GET /api/paintings/:id - Fetch single painting
+apiRouter.get('/paintings/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const [rows] = await pool.query('SELECT * FROM paintings WHERE id = ?', [id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Painting not found' });
+        }
+        const p = rows[0];
+        return res.json({
+            id: Number(p.id),
+            title: p.title,
+            artist: p.artist,
+            category: p.category,
+            price: Number(p.price),
+            image: p.image_url,
+            featured: Boolean(p.featured)
+        });
+    } catch (err) {
+        console.error('Error fetching single painting:', err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// POST /api/paintings - Add a new painting
+apiRouter.post('/paintings', async (req, res) => {
+    const { title, artist, category, price, image, featured } = req.body;
+    if (!title || !artist || !category || price === undefined || !image) {
+        return res.status(400).json({ error: 'Title, artist, category, price, and image are required' });
+    }
+    try {
+        // Find next ID
+        const [maxRows] = await pool.query('SELECT MAX(id) as maxId FROM paintings');
+        const nextId = (maxRows[0].maxId || 0) + 1;
+
+        await pool.query(
+            'INSERT INTO paintings (id, title, artist, category, price, image_url, featured) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [nextId, title.trim(), artist.trim(), category.trim(), Number(price), image, featured ? 1 : 0]
+        );
+
+        console.log(`Created new painting: ID ${nextId} - "${title}" by ${artist}`);
+        return res.status(201).json({
+            id: nextId,
+            title: title.trim(),
+            artist: artist.trim(),
+            category: category.trim(),
+            price: Number(price),
+            image: image,
+            featured: Boolean(featured)
+        });
+    } catch (err) {
+        console.error('Error creating painting:', err);
+        return res.status(500).json({ error: 'Server error creating painting' });
+    }
+});
+
+// PUT /api/paintings/:id - Update an existing painting
+apiRouter.put('/paintings/:id', async (req, res) => {
+    const id = req.params.id;
+    const { title, artist, category, price, image, featured } = req.body;
+    if (!title || !artist || !category || price === undefined || !image) {
+        return res.status(400).json({ error: 'Title, artist, category, price, and image are required' });
+    }
+    try {
+        const [result] = await pool.query(
+            'UPDATE paintings SET title = ?, artist = ?, category = ?, price = ?, image_url = ?, featured = ? WHERE id = ?',
+            [title.trim(), artist.trim(), category.trim(), Number(price), image, featured ? 1 : 0, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Painting not found' });
+        }
+
+        console.log(`Updated painting ID ${id}: "${title}"`);
+        return res.json({
+            id: Number(id),
+            title: title.trim(),
+            artist: artist.trim(),
+            category: category.trim(),
+            price: Number(price),
+            image: image,
+            featured: Boolean(featured)
+        });
+    } catch (err) {
+        console.error('Error updating painting:', err);
+        return res.status(500).json({ error: 'Server error updating painting' });
+    }
+});
+
+// DELETE /api/paintings/:id - Delete a painting
+apiRouter.delete('/paintings/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const [result] = await pool.query('DELETE FROM paintings WHERE id = ?', [id]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Painting not found' });
+        }
+        console.log(`Deleted painting ID ${id}`);
+        return res.json({ success: true, message: `Painting ID ${id} deleted` });
+    } catch (err) {
+        console.error('Error deleting painting:', err);
+        return res.status(500).json({ error: 'Server error deleting painting' });
+    }
+});
+
+// ============================================================
+// Auth & User Endpoints
+// ============================================================
 
 // Sign Up
 apiRouter.post('/auth/signup', async (req, res) => {
@@ -347,6 +506,10 @@ apiRouter.post('/user/data', async (req, res) => {
     }
 });
 
+// ============================================================
+// Cart Endpoints
+// ============================================================
+
 // GET /cart - Fetch user cart
 apiRouter.get('/cart', async (req, res) => {
     if (!req.session.user) {
@@ -453,6 +616,10 @@ apiRouter.delete('/cart', async (req, res) => {
     }
 });
 
+// ============================================================
+// Wishlist Endpoints
+// ============================================================
+
 // GET /wishlist - Fetch user wishlist
 apiRouter.get('/wishlist', async (req, res) => {
     if (!req.session.user) {
@@ -548,6 +715,14 @@ app.get('/wishlistpage.html', (req, res) => {
 
 app.get('/signin.html', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'signin.html'));
+});
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'admin.html'));
+});
+
+app.get('/admin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'admin.html'));
 });
 
 // Export the Express app for Vercel serverless
