@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard — Manage Artworks | Just Art</title>
+    <title>Admin Studio — Upload & Manage Paintings | Just Art</title>
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" href="logo.png" type="image/png" />
     <style>
@@ -34,7 +34,7 @@
             --warning: #F59E0B;
         }
 
-        .admin-layout { max-width: 1440px; margin: 0 auto; padding: 0 24px 60px; }
+        .admin-layout { max-width: 1300px; margin: 0 auto; padding: 0 24px 60px; }
 
         /* Top Header */
         .admin-header {
@@ -61,7 +61,7 @@
         }
         .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--warm-white); }
         .btn-primary {
-            padding: 10px 22px; border-radius: 30px; font-size: 14px; font-weight: 600;
+            padding: 11px 24px; border-radius: 30px; font-size: 14px; font-weight: 600;
             background: var(--primary); color: #fff; transition: 0.3s ease;
             display: inline-flex; align-items: center; gap: 6px;
         }
@@ -102,28 +102,28 @@
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group.full-width { grid-column: 1 / -1; }
         .form-label { font-size: 14px; font-weight: 600; color: var(--secondary); }
-        .form-input, .form-select {
+        .form-input {
             width: 100%; padding: 12px 16px; border: 1px solid var(--border-color);
             border-radius: 8px; font-size: 15px; background: var(--warm-white);
             color: var(--primary); transition: 0.3s;
         }
-        .form-input:focus, .form-select:focus {
+        .form-input:focus {
             border-color: var(--accent); background: #fff;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
 
         /* Image Upload Box */
         .image-upload-zone {
-            border: 2px dashed var(--border-color); border-radius: 12px;
-            padding: 24px; text-align: center; background: #FAFBFD;
+            border: 2px dashed #93C5FD; border-radius: 12px;
+            padding: 28px; text-align: center; background: #EFF6FF;
             transition: 0.3s; cursor: pointer; position: relative;
         }
-        .image-upload-zone:hover, .image-upload-zone.dragover {
-            border-color: var(--accent); background: #EFF6FF;
+        .image-upload-zone:hover {
+            border-color: var(--accent); background: #DBEAFE;
         }
-        .upload-icon { font-size: 36px; color: var(--accent); margin-bottom: 8px; }
-        .upload-text { font-size: 14px; color: var(--secondary); font-weight: 600; }
-        .upload-subtext { font-size: 12px; color: #94A3B8; margin-top: 4px; }
+        .upload-icon { font-size: 38px; color: var(--accent); margin-bottom: 8px; }
+        .upload-text { font-size: 15px; color: var(--primary); font-weight: 700; }
+        .upload-subtext { font-size: 13px; color: #64748B; margin-top: 4px; }
         .file-hidden { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 
         .image-preview-wrap {
@@ -137,7 +137,7 @@
             padding: 6px 12px; border-radius: 6px; border: 1px solid #FEE2E2; background: #FEF2F2;
         }
 
-        /* Filter Controls */
+        /* Catalog Search */
         .catalog-controls {
             display: flex; align-items: center; justify-content: space-between;
             gap: 16px; flex-wrap: wrap; margin-bottom: 24px;
@@ -150,10 +150,6 @@
             border-radius: 24px; font-size: 14px; background: #fff;
         }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94A3B8; }
-        .filter-select {
-            padding: 10px 16px; border: 1px solid var(--border-color);
-            border-radius: 24px; font-size: 14px; background: #fff; color: var(--secondary);
-        }
 
         /* Artworks Grid */
         .artworks-grid {
@@ -167,33 +163,27 @@
         }
         .art-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: #CBD5E1; }
         .art-thumb-wrap {
-            position: relative; width: 100%; height: 220px; overflow: hidden; background: #E2E8F0;
+            position: relative; width: 100%; height: 260px; overflow: hidden; background: #E2E8F0;
         }
         .art-thumb {
             width: 100%; height: 100%; object-fit: cover; transition: 0.4s ease;
         }
         .art-card:hover .art-thumb { transform: scale(1.04); }
-        .badge-cat {
-            position: absolute; top: 12px; left: 12px; background: rgba(30, 41, 59, 0.85);
-            color: #fff; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
-            backdrop-filter: blur(4px);
-        }
         .badge-featured {
             position: absolute; top: 12px; right: 12px; background: #FEF3C7;
             color: #B45309; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
         }
         .art-details { padding: 18px; display: flex; flex-direction: column; flex: 1; }
-        .art-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
-        .art-artist { font-size: 13px; color: #64748B; font-style: italic; margin-bottom: 12px; }
+        .art-title { font-size: 19px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
         .art-footer {
             display: flex; align-items: center; justify-content: space-between;
-            margin-top: auto; padding-top: 12px; border-top: 1px solid #F1F5F9;
+            margin-top: auto; padding-top: 14px; border-top: 1px solid #F1F5F9;
         }
-        .art-price { font-size: 19px; font-weight: 700; color: var(--accent); font-family: 'Georgia', serif; }
+        .art-price { font-size: 20px; font-weight: 700; color: var(--accent); font-family: 'Georgia', serif; }
         .art-actions { display: flex; gap: 8px; }
         .btn-icon {
-            width: 34px; height: 34px; border-radius: 8px; display: flex;
-            align-items: center; justify-content: center; font-size: 14px;
+            width: 36px; height: 36px; border-radius: 8px; display: flex;
+            align-items: center; justify-content: center; font-size: 15px;
             border: 1px solid var(--border-color); background: var(--warm-white);
             color: var(--secondary); transition: 0.2s;
         }
@@ -209,7 +199,7 @@
         .modal-overlay.active { display: flex; }
         .modal-box {
             background: #fff; border-radius: var(--radius); width: 100%;
-            max-width: 600px; max-height: 90vh; overflow-y: auto;
+            max-width: 540px; max-height: 90vh; overflow-y: auto;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             border: 1px solid var(--border-color);
         }
@@ -253,7 +243,7 @@
         <!-- Header -->
         <header class="admin-header">
             <div class="brand-wrap">
-                <img src="logo.png" alt="Just Art" class="logo-img" />
+                <img src="logo.png" alt="Just Art Logo" class="logo-img" onerror="this.style.display='none'" />
                 <div class="brand-title">Just Art</div>
                 <span class="brand-badge">Admin Studio</span>
             </div>
@@ -265,7 +255,7 @@
                     <span>🖼️ View Gallery</span>
                 </a>
                 <a href="#addSection" class="btn-primary">
-                    <span>＋ Add New Artwork</span>
+                    <span>＋ Add Painting</span>
                 </a>
             </div>
         </header>
@@ -275,10 +265,6 @@
             <div class="stat-card">
                 <span class="stat-label">Total Artworks</span>
                 <span class="stat-val" id="statTotalPaintings">—</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Categories</span>
-                <span class="stat-val" id="statTotalCategories">—</span>
             </div>
             <div class="stat-card">
                 <span class="stat-label">Featured Artworks</span>
@@ -293,44 +279,26 @@
         <!-- ADD NEW PAINTING PANEL -->
         <section class="panel" id="addSection">
             <div class="panel-header">
-                <div class="panel-title">✨ Add New Painting to Gallery</div>
-                <span style="font-size:13px; color:#64748B;">Upload your original artwork directly</span>
+                <div class="panel-title">✨ Upload New Painting</div>
+                <span style="font-size:13px; color:#64748B;">Upload your real painting photo & set price</span>
             </div>
             <div class="panel-body">
                 <form id="addPaintingForm">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label" for="addTitle">Painting Title *</label>
+                            <label class="form-label" for="addTitle">Painting Name *</label>
                             <input type="text" id="addTitle" class="form-input" placeholder="e.g. Whispers of Dawn" required />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="addArtist">Artist Name *</label>
-                            <input type="text" id="addArtist" class="form-input" placeholder="e.g. Elena Voss" required />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="addCategory">Category *</label>
-                            <select id="addCategory" class="form-select" required>
-                                <option value="Landscape">Landscape</option>
-                                <option value="Portrait">Portrait</option>
-                                <option value="Abstract">Abstract</option>
-                                <option value="Expressionism">Expressionism</option>
-                                <option value="Impressionism">Impressionism</option>
-                                <option value="Surrealism">Surrealism</option>
-                                <option value="Seascape">Seascape</option>
-                                <option value="Contemporary">Contemporary</option>
-                                <option value="Floral">Floral</option>
-                            </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="addPrice">Price ($ USD) *</label>
                             <input type="number" id="addPrice" class="form-input" placeholder="e.g. 549" min="1" step="1" required />
                         </div>
                         <div class="form-group full-width">
-                            <label class="form-label">Painting Image *</label>
+                            <label class="form-label">Upload Painting Image *</label>
                             <div class="image-upload-zone" id="addDropZone">
                                 <div class="upload-icon">📸</div>
-                                <div class="upload-text">Click or Drag & Drop Image Here</div>
-                                <div class="upload-subtext">JPG, PNG, WebP supported (high resolution)</div>
+                                <div class="upload-text">Click or Drag & Drop Painting Photo Here</div>
+                                <div class="upload-subtext">JPG, PNG, WebP supported (from your computer or phone)</div>
                                 <input type="file" id="addFileInput" class="file-hidden" accept="image/*" />
                             </div>
 
@@ -355,7 +323,7 @@
                     </div>
 
                     <div style="margin-top: 24px; display:flex; justify-content:flex-end;">
-                        <button type="submit" class="btn-primary" id="btnSubmitAdd" style="padding:12px 30px; font-size:15px;">
+                        <button type="submit" class="btn-primary" id="btnSubmitAdd" style="padding:12px 32px; font-size:15px;">
                             <span>💾 Save & Publish Artwork</span>
                         </button>
                     </div>
@@ -366,18 +334,15 @@
         <!-- ARTWORK CATALOG -->
         <section class="panel">
             <div class="panel-header">
-                <div class="panel-title">🖼️ Gallery Artwork Catalog</div>
-                <div style="font-size:13px; color:#64748B;">Click Edit to update artwork images & details</div>
+                <div class="panel-title">🖼️ Gallery Artworks</div>
+                <div style="font-size:13px; color:#64748B;">Click ✏️ Edit to replace image or update price</div>
             </div>
             <div class="panel-body">
                 <div class="catalog-controls">
                     <div class="search-box">
                         <span class="search-icon">🔍</span>
-                        <input type="text" id="catalogSearch" placeholder="Search by title, artist..." />
+                        <input type="text" id="catalogSearch" placeholder="Search paintings by name…" />
                     </div>
-                    <select id="catalogCategoryFilter" class="filter-select">
-                        <option value="All">All Categories</option>
-                    </select>
                 </div>
 
                 <div id="catalogLoading" class="loading-state">
@@ -401,35 +366,17 @@
                 <form id="editPaintingForm">
                     <input type="hidden" id="editId" />
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label" for="editTitle">Painting Title *</label>
+                        <div class="form-group full-width">
+                            <label class="form-label" for="editTitle">Painting Name *</label>
                             <input type="text" id="editTitle" class="form-input" required />
                         </div>
-                        <div class="form-group">
-                            <label class="form-label" for="editArtist">Artist Name *</label>
-                            <input type="text" id="editArtist" class="form-input" required />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="editCategory">Category *</label>
-                            <select id="editCategory" class="form-select" required>
-                                <option value="Landscape">Landscape</option>
-                                <option value="Portrait">Portrait</option>
-                                <option value="Abstract">Abstract</option>
-                                <option value="Expressionism">Expressionism</option>
-                                <option value="Impressionism">Impressionism</option>
-                                <option value="Surrealism">Surrealism</option>
-                                <option value="Seascape">Seascape</option>
-                                <option value="Contemporary">Contemporary</option>
-                                <option value="Floral">Floral</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
+                        <div class="form-group full-width">
                             <label class="form-label" for="editPrice">Price ($ USD) *</label>
                             <input type="number" id="editPrice" class="form-input" min="1" step="1" required />
                         </div>
                         <div class="form-group full-width">
-                            <label class="form-label">Replace Artwork Image</label>
-                            <div class="image-upload-zone" id="editDropZone" style="padding:16px;">
+                            <label class="form-label">Replace Artwork Photo</label>
+                            <div class="image-upload-zone" id="editDropZone" style="padding:18px;">
                                 <div class="upload-icon" style="font-size:24px;">🔄</div>
                                 <div class="upload-text">Upload New Image File</div>
                                 <input type="file" id="editFileInput" class="file-hidden" accept="image/*" />
@@ -443,8 +390,8 @@
                             <div class="image-preview-wrap" id="editPreviewWrap" style="display:flex;">
                                 <img src="" alt="Current Image" class="preview-img" id="editPreviewImg" />
                                 <div class="preview-info">
-                                    <strong>Active Artwork Image</strong>
-                                    <p style="color:#64748B; font-size:12px;">This image is live on your website</p>
+                                    <strong>Active Artwork Photo</strong>
+                                    <p style="color:#64748B; font-size:12px;">Live in your gallery</p>
                                 </div>
                             </div>
                         </div>
@@ -474,7 +421,6 @@
 
         // DOM Elements
         const statTotal = document.getElementById('statTotalPaintings');
-        const statCategories = document.getElementById('statTotalCategories');
         const statFeatured = document.getElementById('statFeaturedCount');
         const statValue = document.getElementById('statTotalValue');
 
@@ -484,10 +430,8 @@
         const addPreviewWrap = document.getElementById('addPreviewWrap');
         const addPreviewImg = document.getElementById('addPreviewImg');
         const addBtnRemove = document.getElementById('btnAddRemovePreview');
-        const addDropZone = document.getElementById('addDropZone');
 
         const catalogSearch = document.getElementById('catalogSearch');
-        const catalogCategoryFilter = document.getElementById('catalogCategoryFilter');
         const catalogLoading = document.getElementById('catalogLoading');
         const artworksGrid = document.getElementById('artworksGrid');
 
@@ -572,7 +516,6 @@
             try {
                 currentPaintings = await fetchPaintings();
                 updateStats();
-                populateCategoryFilter();
                 renderCatalog();
             } catch (err) {
                 showToast('Failed to load paintings: ' + err.message, 'error');
@@ -585,46 +528,24 @@
         // Update Stats
         function updateStats() {
             statTotal.textContent = currentPaintings.length;
-            const uniqueCats = [...new Set(currentPaintings.map(p => p.category))];
-            statCategories.textContent = uniqueCats.length;
             statFeatured.textContent = currentPaintings.filter(p => p.featured).length;
-
             const totalVal = currentPaintings.reduce((sum, p) => sum + Number(p.price || 0), 0);
             statValue.textContent = '$' + totalVal.toLocaleString('en-US');
-        }
-
-        // Populate Category Filter
-        function populateCategoryFilter() {
-            const categories = [...new Set(currentPaintings.map(p => p.category))].sort();
-            const currentSelected = catalogCategoryFilter.value;
-            catalogCategoryFilter.innerHTML = '<option value="All">All Categories</option>';
-            categories.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.textContent = cat;
-                if (cat === currentSelected) opt.selected = true;
-                catalogCategoryFilter.appendChild(opt);
-            });
         }
 
         // Render Catalog Grid
         function renderCatalog() {
             const searchTerm = catalogSearch.value.trim().toLowerCase();
-            const selectedCat = catalogCategoryFilter.value;
 
             const filtered = currentPaintings.filter(p => {
-                const matchesSearch = !searchTerm ||
-                    p.title.toLowerCase().includes(searchTerm) ||
-                    p.artist.toLowerCase().includes(searchTerm);
-                const matchesCat = selectedCat === 'All' || p.category === selectedCat;
-                return matchesSearch && matchesCat;
+                return !searchTerm || p.title.toLowerCase().includes(searchTerm);
             });
 
             if (filtered.length === 0) {
                 artworksGrid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align:center; padding: 40px; color:#64748B;">
-                        <p style="font-size:18px; margin-bottom:6px;">No artworks match your search.</p>
-                        <p style="font-size:14px;">Try changing your search term or category filter.</p>
+                        <p style="font-size:18px; margin-bottom:6px;">No paintings uploaded yet.</p>
+                        <p style="font-size:14px;">Use the form above to add your first real artwork!</p>
                     </div>
                 `;
                 return;
@@ -633,18 +554,16 @@
             artworksGrid.innerHTML = filtered.map(p => `
                 <div class="art-card" data-id="${p.id}">
                     <div class="art-thumb-wrap">
-                        <img src="${p.image}" alt="${p.title}" class="art-thumb" onerror="this.src='https://picsum.photos/seed/art_${p.id}/400/500'" />
-                        <span class="badge-cat">${p.category}</span>
+                        <img src="${p.image}" alt="${p.title}" class="art-thumb" />
                         ${p.featured ? '<span class="badge-featured">★ Featured</span>' : ''}
                     </div>
                     <div class="art-details">
                         <h3 class="art-title">${p.title}</h3>
-                        <p class="art-artist">by ${p.artist}</p>
                         <div class="art-footer">
                             <div class="art-price">$${Number(p.price).toLocaleString('en-US')}</div>
                             <div class="art-actions">
-                                <button class="btn-icon btn-edit" title="Edit Artwork" data-id="${p.id}">✏️</button>
-                                <button class="btn-icon delete btn-delete" title="Delete Artwork" data-id="${p.id}">🗑️</button>
+                                <button class="btn-icon btn-edit" title="Edit Painting" data-id="${p.id}">✏️</button>
+                                <button class="btn-icon delete btn-delete" title="Delete Painting" data-id="${p.id}">🗑️</button>
                             </div>
                         </div>
                     </div>
@@ -671,8 +590,6 @@
             }
 
             const title = document.getElementById('addTitle').value.trim();
-            const artist = document.getElementById('addArtist').value.trim();
-            const category = document.getElementById('addCategory').value;
             const price = Number(document.getElementById('addPrice').value);
             const featured = document.getElementById('addFeatured').checked;
 
@@ -681,10 +598,8 @@
             submitBtn.textContent = 'Saving Artwork…';
 
             try {
-                const newPainting = await apiAddPainting({
+                await apiAddPainting({
                     title,
-                    artist,
-                    category,
                     price,
                     image: activeImageData,
                     featured
@@ -711,8 +626,6 @@
 
             document.getElementById('editId').value = painting.id;
             document.getElementById('editTitle').value = painting.title;
-            document.getElementById('editArtist').value = painting.artist;
-            document.getElementById('editCategory').value = painting.category;
             document.getElementById('editPrice').value = painting.price;
             document.getElementById('editFeatured').checked = Boolean(painting.featured);
 
@@ -736,12 +649,10 @@
         btnEditSave.addEventListener('click', async () => {
             const id = document.getElementById('editId').value;
             const title = document.getElementById('editTitle').value.trim();
-            const artist = document.getElementById('editArtist').value.trim();
-            const category = document.getElementById('editCategory').value;
             const price = Number(document.getElementById('editPrice').value);
             const featured = document.getElementById('editFeatured').checked;
 
-            if (!title || !artist || !price || !editImageData) {
+            if (!title || !price || !editImageData) {
                 showToast('Please fill all required fields and ensure image is set', 'error');
                 return;
             }
@@ -752,8 +663,6 @@
             try {
                 await apiUpdatePainting(id, {
                     title,
-                    artist,
-                    category,
                     price,
                     image: editImageData,
                     featured
@@ -788,9 +697,8 @@
             }
         }
 
-        // Search & Filter listeners
+        // Search listener
         catalogSearch.addEventListener('input', renderCatalog);
-        catalogCategoryFilter.addEventListener('change', renderCatalog);
 
         // Initial Load
         loadCatalog();

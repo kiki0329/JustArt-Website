@@ -788,28 +788,15 @@
             <section class="hero">
                 <div class="hero-content">
                     <h1>Where <span>Art</span> Finds a Home</h1>
-                    <p>Discover timeless paintings from emerging and master artists. Each piece tells a story.</p>
+                    <p>Discover timeless original paintings. Handcrafted with passion and creativity.</p>
                     <a href="gallerypage.html" class="hero-btn">Explore Gallery →</a>
-                    <div class="hero-stats">
-                        <div><span class="num">200+</span><span class="label">Original Works</span></div>
-                        <div><span class="num">45</span><span class="label">Artists</span></div>
-                        <div><span class="num">12</span><span class="label">Categories</span></div>
-                    </div>
                 </div>
             </section>
 
             <div class="section-header">
                 <div>
-                    <h2 class="section-title">Categories</h2>
-                    <p class="section-sub">Browse by style &amp; subject</p>
-                </div>
-            </div>
-            <div class="categories-grid" id="categoriesGrid"></div>
-
-            <div class="section-header">
-                <div>
                     <h2 class="section-title">Featured Paintings</h2>
-                    <p class="section-sub">Curated selections for your collection</p>
+                    <p class="section-sub">Curated original works</p>
                 </div>
             </div>
             <div class="product-grid" id="featuredGrid"></div>
@@ -1006,8 +993,6 @@
                     </div>
                     <div class="product-info">
                         <div class="title">${p.title}</div>
-                        <div class="artist">by ${p.artist}</div>
-                        <span class="category-tag">${p.category}</span>
                         <div class="price-row">
                             <span class="price">${formatPrice(p.price)}</span>
                             <button class="add-cart-btn ${inCart ? 'added' : ''}" data-id="${p.id}">${inCart ? '✓ In Cart' : '🛒 Add'}</button>
@@ -1019,7 +1004,17 @@
 
         function renderFeatured() {
             const featured = paintings.filter(p => p.featured);
-            featuredGrid.innerHTML = featured.map(p => renderProductCard(p)).join('');
+            const listToShow = featured.length ? featured : paintings.slice(0, 6);
+            if (!listToShow.length) {
+                featuredGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px 0; color: #64748B;">
+                        <p style="font-size: 18px; margin-bottom: 8px;">🎨 No paintings uploaded yet</p>
+                        <a href="admin.html" style="color: var(--accent); font-weight: 600;">Go to Admin Studio to upload your first painting →</a>
+                    </div>
+                `;
+                return;
+            }
+            featuredGrid.innerHTML = listToShow.map(p => renderProductCard(p)).join('');
         }
 
         function updateBadges() {
@@ -1172,7 +1167,6 @@
                 // Clean URL
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
-            renderCategories();
             renderFeatured();
             updateBadges();
             document.querySelector('.nav-links a[href="homepage.html"]')?.classList.add('active');

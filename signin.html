@@ -227,7 +227,7 @@
                 await signIn(email, password);   // <-- calls the function from db-common.js
                 window.location.href = 'homepage.html?login=success';
             } catch (err) {
-                siError.textContent = friendlyAuthError(err.code);
+                siError.textContent = friendlyAuthError(err);
                 siError.style.display = 'block';
                 siBtn.disabled = false;
                 siBtn.textContent = 'Sign In';
@@ -263,7 +263,7 @@
                     window.location.href = 'homepage.html?login=success';
                 }, 900);
             } catch (err) {
-                suError.textContent = friendlyAuthError(err.code);
+                suError.textContent = friendlyAuthError(err);
                 suError.style.display = 'block';
                 suBtn.disabled = false;
                 suBtn.textContent = 'Create Account';
@@ -273,7 +273,9 @@
         // ------------------------------------------------------------
         // Turn backend auth raw error codes into plain-English messages
         // ------------------------------------------------------------
-        function friendlyAuthError(code) {
+        function friendlyAuthError(err) {
+            if (typeof err === 'string') return err;
+            const code = err?.code;
             const map = {
                 'auth/email-already-in-use': 'That email already has an account — try signing in instead.',
                 'auth/invalid-email': 'That email address doesn\'t look right.',
@@ -283,7 +285,7 @@
                 'auth/invalid-credential': 'Incorrect email or password.',
                 'auth/too-many-requests': 'Too many attempts — please wait a moment and try again.'
             };
-            return map[code] || 'Something went wrong. Please try again.';
+            return map[code] || err?.message || 'Something went wrong. Please try again.';
         }
     </script>
 </body>

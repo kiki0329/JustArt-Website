@@ -1,12 +1,11 @@
 // api/index.js
 // Vercel Serverless Function entry point
-// Handles all API endpoints (Auth, Cart, Wishlist, Paintings CRUD) & static page routes seamlessly with Cloud MySQL support.
+// Handles all API endpoints (Auth, Cart, Wishlist, Paintings CRUD) without artist/category requirements.
 
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const mysql = require('mysql2/promise');
-const session = require('express-session');
 const bcrypt = require('bcryptjs');
 
 const app = express();
@@ -15,29 +14,25 @@ const app = express();
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-user-id');
     if (req.method === 'OPTIONS') {
         return res.sendStatus(200);
     }
     next();
 });
 
-// Serve static HTML/CSS/JS files from the project root
-app.use(express.static(path.join(__dirname, '..')));
+// Parse JSON and form payloads with 15MB limit for direct photo uploads
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
-// Express session setup
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'ki_just_art_secret_session_key_2026_08_13',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000
-    }
-}));
+// Helper to extract user ID from request (supports headers, query, body, or session)
+function getReqUserId(req) {
+    const headerUid = req.headers['x-user-id'];
+    if (headerUid) return parseInt(headerUid, 10);
+    if (req.query && req.query.userId) return parseInt(req.query.userId, 10);
+    if (req.body && req.body.userId) return parseInt(req.body.userId, 10);
+    return null;
+}
 
 // MySQL Database connection pool (supports cloud MySQL with SSL automatically)
 const isCloudDb = process.env.DB_HOST && process.env.DB_HOST !== 'localhost' && process.env.DB_HOST !== '127.0.0.1';
@@ -54,36 +49,6 @@ const pool = mysql.createPool({
     ssl: isCloudDb ? { rejectUnauthorized: false } : undefined
 });
 
-// Paintings list for seeding database
-const initialPaintings = [
-    { id: 1, title: 'Whispers of Dawn', artist: 'Elena Voss', category: 'Landscape', price: 549, image: 'https://picsum.photos/seed/dawn_blue/400/500', featured: true },
-    { id: 2, title: 'Eternal Silence', artist: 'Marcus Reed', category: 'Portrait', price: 799, image: 'https://picsum.photos/seed/silence_blue/400/500', featured: true },
-    { id: 3, title: 'Crimson Horizon', artist: 'Sophia Chen', category: 'Abstract', price: 649, image: 'https://picsum.photos/seed/crimson_blue/400/500', featured: true },
-    { id: 4, title: 'Dancing Shadows', artist: 'Oliver Stone', category: 'Expressionism', price: 729, image: 'https://picsum.photos/seed/shadow_blue/400/500', featured: true },
-    { id: 5, title: 'Golden Afternoon', artist: 'Clara Belle', category: 'Impressionism', price: 499, image: 'https://picsum.photos/seed/golden_blue/400/500', featured: false },
-    { id: 6, title: 'Midnight Reverie', artist: 'Julian Cross', category: 'Surrealism', price: 879, image: 'https://picsum.photos/seed/midnight_blue/400/500', featured: false },
-    { id: 7, title: 'Ocean\'s Whisper', artist: 'Nina Torres', category: 'Seascape', price: 599, image: 'https://picsum.photos/seed/ocean_blue/400/500', featured: false },
-    { id: 8, title: 'Autumn Melody', artist: 'Henry Wright', category: 'Landscape', price: 399, image: 'https://picsum.photos/seed/autumn_blue/400/500', featured: false },
-    { id: 9, title: 'Celestial Dreams', artist: 'Iris Moon', category: 'Abstract', price: 699, image: 'https://picsum.photos/seed/celestial_blue/400/500', featured: false },
-    { id: 10, title: 'Whispering Pines', artist: 'David Grey', category: 'Landscape', price: 479, image: 'https://picsum.photos/seed/pines_blue/400/500', featured: false },
-    { id: 11, title: 'Silent Revolution', artist: 'Zara Khan', category: 'Contemporary', price: 949, image: 'https://picsum.photos/seed/revolution_blue/400/500', featured: false },
-    { id: 12, title: 'Ethereal Bloom', artist: 'Lily Rose', category: 'Floral', price: 529, image: 'https://picsum.photos/seed/bloom_blue/400/500', featured: false },
-    { id: 13, title: 'Urban Solitude', artist: 'Arjun Mehta', category: 'Contemporary', price: 659, image: 'https://picsum.photos/seed/urban_blue/400/500', featured: false },
-    { id: 14, title: 'Mystic Gaze', artist: 'Priya Sharma', category: 'Portrait', price: 899, image: 'https://picsum.photos/seed/mystic_blue/400/500', featured: false },
-    { id: 15, title: 'Rustic Charms', artist: 'Ananya Reddy', category: 'Impressionism', price: 569, image: 'https://picsum.photos/seed/rustic_blue/400/500', featured: false },
-    { id: 16, title: 'Neon Dreams', artist: 'Vikram Seth', category: 'Abstract', price: 999, image: 'https://picsum.photos/seed/neon_blue/400/500', featured: false },
-    { id: 17, title: 'Serene Shores', artist: 'Meera Nair', category: 'Seascape', price: 449, image: 'https://picsum.photos/seed/serene_blue/400/500', featured: false },
-    { id: 18, title: 'Blossom Trail', artist: 'Ravi Verma', category: 'Floral', price: 749, image: 'https://picsum.photos/seed/blossom_blue/400/500', featured: false },
-    { id: 19, title: 'Fading Echoes', artist: 'Sana Khan', category: 'Expressionism', price: 629, image: 'https://picsum.photos/seed/echoes_blue/400/500', featured: false },
-    { id: 20, title: 'Tranquil Peaks', artist: 'Aisha Kapoor', category: 'Landscape', price: 539, image: 'https://picsum.photos/seed/peaks_blue/400/500', featured: false },
-    { id: 21, title: 'Whimsical Forest', artist: 'Kabir Singh', category: 'Surrealism', price: 829, image: 'https://picsum.photos/seed/forest_blue/400/500', featured: false },
-    { id: 22, title: 'Timeless Grace', artist: 'Lakshmi Menon', category: 'Portrait', price: 929, image: 'https://picsum.photos/seed/grace_blue/400/500', featured: false },
-    { id: 23, title: 'Modern Muse', artist: 'Rahul Khanna', category: 'Contemporary', price: 719, image: 'https://picsum.photos/seed/muse_blue/400/500', featured: false },
-    { id: 24, title: 'Golden Horizon', artist: 'Maya Patel', category: 'Impressionism', price: 589, image: 'https://picsum.photos/seed/horizon_blue/400/500', featured: false },
-    { id: 25, title: 'Abstract Reality', artist: 'Arnav Bose', category: 'Abstract', price: 979, image: 'https://picsum.photos/seed/reality_blue/400/500', featured: false },
-    { id: 26, title: 'Mountain Echo', artist: 'Neha Gupta', category: 'Landscape', price: 349, image: 'https://picsum.photos/seed/mountain_blue/400/500', featured: false }
-];
-
 // Automatically create database and tables if they don't exist
 async function initializeDatabase() {
     try {
@@ -99,8 +64,8 @@ async function initializeDatabase() {
             CREATE TABLE IF NOT EXISTS paintings (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 title VARCHAR(255) NOT NULL,
-                artist VARCHAR(255) NOT NULL,
-                category VARCHAR(255) NOT NULL,
+                artist VARCHAR(255) DEFAULT '',
+                category VARCHAR(255) DEFAULT 'Original',
                 price DECIMAL(10, 2) NOT NULL,
                 image_url MEDIUMTEXT NOT NULL,
                 featured TINYINT DEFAULT 0
@@ -138,34 +103,16 @@ async function initializeDatabase() {
         // Ensure image_url column is MEDIUMTEXT to hold base64 image data
         try {
             await pool.query('ALTER TABLE paintings MODIFY image_url MEDIUMTEXT NOT NULL;');
-        } catch (e) {
-            // Already modified or not needed
-        }
+        } catch (e) {}
+
+        // Remove old dummy internet paintings with picsum links so only user-uploaded art is shown
+        try {
+            await pool.query("DELETE FROM paintings WHERE image_url LIKE '%picsum.photos%'");
+        } catch (e) {}
 
         console.log('Database tables verified/created successfully.');
     } catch (err) {
         console.error('Error verifying/creating database tables:', err.message);
-    }
-}
-
-// Seed the paintings database on start if it's empty
-async function seedDatabase() {
-    try {
-        const [rows] = await pool.query('SELECT COUNT(*) as count FROM paintings');
-        if (rows[0].count === 0) {
-            console.log('Database paintings table is empty. Seeding paintings...');
-            for (const p of initialPaintings) {
-                await pool.query(
-                    'INSERT INTO paintings (id, title, artist, category, price, image_url, featured) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [p.id, p.title, p.artist, p.category, p.price, p.image, p.featured ? 1 : 0]
-                );
-            }
-            console.log('Seeding completed successfully!');
-        } else {
-            console.log(`Database contains ${rows[0].count} paintings.`);
-        }
-    } catch (err) {
-        console.error('Error seeding paintings table:', err.message);
     }
 }
 
@@ -174,7 +121,6 @@ let dbInitialized = false;
 async function ensureDbReady() {
     if (!dbInitialized) {
         await initializeDatabase();
-        await seedDatabase();
         dbInitialized = true;
     }
 }
@@ -195,21 +141,17 @@ app.use(async (req, res, next) => {
 const apiRouter = express.Router();
 
 // ============================================================
-// Paintings CRUD Endpoints
+// Paintings CRUD Endpoints (Simplified: Title, Price, Image, Featured)
 // ============================================================
 
 // GET /api/paintings - Fetch all paintings from MySQL
 apiRouter.get('/paintings', async (req, res) => {
     try {
-        const { category, featured } = req.query;
+        const { featured } = req.query;
         let query = 'SELECT * FROM paintings';
         const params = [];
         const conditions = [];
 
-        if (category && category !== 'All' && category !== 'all') {
-            conditions.push('category = ?');
-            params.push(category);
-        }
         if (featured === 'true' || featured === '1') {
             conditions.push('featured = 1');
         }
@@ -217,14 +159,12 @@ apiRouter.get('/paintings', async (req, res) => {
         if (conditions.length > 0) {
             query += ' WHERE ' + conditions.join(' AND ');
         }
-        query += ' ORDER BY id ASC';
+        query += ' ORDER BY id DESC';
 
         const [rows] = await pool.query(query, params);
         const formatted = rows.map(p => ({
             id: Number(p.id),
             title: p.title,
-            artist: p.artist,
-            category: p.category,
             price: Number(p.price),
             image: p.image_url,
             featured: Boolean(p.featured)
@@ -248,8 +188,6 @@ apiRouter.get('/paintings/:id', async (req, res) => {
         return res.json({
             id: Number(p.id),
             title: p.title,
-            artist: p.artist,
-            category: p.category,
             price: Number(p.price),
             image: p.image_url,
             featured: Boolean(p.featured)
@@ -262,26 +200,23 @@ apiRouter.get('/paintings/:id', async (req, res) => {
 
 // POST /api/paintings - Add a new painting
 apiRouter.post('/paintings', async (req, res) => {
-    const { title, artist, category, price, image, featured } = req.body;
-    if (!title || !artist || !category || price === undefined || !image) {
-        return res.status(400).json({ error: 'Title, artist, category, price, and image are required' });
+    const { title, price, image, featured } = req.body;
+    if (!title || price === undefined || !image) {
+        return res.status(400).json({ error: 'Title, price, and image are required' });
     }
     try {
-        // Find next ID
         const [maxRows] = await pool.query('SELECT MAX(id) as maxId FROM paintings');
         const nextId = (maxRows[0].maxId || 0) + 1;
 
         await pool.query(
             'INSERT INTO paintings (id, title, artist, category, price, image_url, featured) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [nextId, title.trim(), artist.trim(), category.trim(), Number(price), image, featured ? 1 : 0]
+            [nextId, title.trim(), '', 'Original', Number(price), image, featured ? 1 : 0]
         );
 
-        console.log(`Created new painting: ID ${nextId} - "${title}" by ${artist}`);
+        console.log(`Created new painting: ID ${nextId} - "${title}" ($${price})`);
         return res.status(201).json({
             id: nextId,
             title: title.trim(),
-            artist: artist.trim(),
-            category: category.trim(),
             price: Number(price),
             image: image,
             featured: Boolean(featured)
@@ -295,26 +230,24 @@ apiRouter.post('/paintings', async (req, res) => {
 // PUT /api/paintings/:id - Update an existing painting
 apiRouter.put('/paintings/:id', async (req, res) => {
     const id = req.params.id;
-    const { title, artist, category, price, image, featured } = req.body;
-    if (!title || !artist || !category || price === undefined || !image) {
-        return res.status(400).json({ error: 'Title, artist, category, price, and image are required' });
+    const { title, price, image, featured } = req.body;
+    if (!title || price === undefined || !image) {
+        return res.status(400).json({ error: 'Title, price, and image are required' });
     }
     try {
         const [result] = await pool.query(
-            'UPDATE paintings SET title = ?, artist = ?, category = ?, price = ?, image_url = ?, featured = ? WHERE id = ?',
-            [title.trim(), artist.trim(), category.trim(), Number(price), image, featured ? 1 : 0, id]
+            'UPDATE paintings SET title = ?, price = ?, image_url = ?, featured = ? WHERE id = ?',
+            [title.trim(), Number(price), image, featured ? 1 : 0, id]
         );
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Painting not found' });
         }
 
-        console.log(`Updated painting ID ${id}: "${title}"`);
+        console.log(`Updated painting ID ${id}: "${title}" ($${price})`);
         return res.json({
             id: Number(id),
             title: title.trim(),
-            artist: artist.trim(),
-            category: category.trim(),
             price: Number(price),
             image: image,
             featured: Boolean(featured)
@@ -342,7 +275,7 @@ apiRouter.delete('/paintings/:id', async (req, res) => {
 });
 
 // ============================================================
-// Auth & User Endpoints
+// Auth & User Endpoints (Stateless for Serverless Compatibility)
 // ============================================================
 
 // Sign Up
@@ -355,19 +288,17 @@ apiRouter.post('/auth/signup', async (req, res) => {
         return res.status(400).json({ error: 'Password must be at least 6 characters', code: 'auth/weak-password' });
     }
     try {
-        const [existing] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        const [existing] = await pool.query('SELECT * FROM users WHERE email = ?', [email.trim().toLowerCase()]);
         if (existing.length > 0) {
             return res.status(400).json({ error: 'Email already in use', code: 'auth/email-already-in-use' });
         }
 
         const hash = await bcrypt.hash(password, 10);
-        const [result] = await pool.query('INSERT INTO users (email, password_hash) VALUES (?, ?)', [email, hash]);
+        const [result] = await pool.query('INSERT INTO users (email, password_hash) VALUES (?, ?)', [email.trim().toLowerCase(), hash]);
         const userId = result.insertId;
 
-        const user = { uid: userId, email: email };
-        req.session.user = user;
-
-        console.log(`Successful SignUp: user ID ${userId}, email: ${email}`);
+        const user = { uid: userId, email: email.trim().toLowerCase() };
+        console.log(`Successful SignUp: user ID ${userId}, email: ${user.email}`);
         return res.json({ user });
     } catch (err) {
         console.error('Signup error:', err);
@@ -382,7 +313,7 @@ apiRouter.post('/auth/signin', async (req, res) => {
         return res.status(400).json({ error: 'Email and password are required', code: 'auth/invalid-credential' });
     }
     try {
-        const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email.trim().toLowerCase()]);
         if (users.length === 0) {
             return res.status(400).json({ error: 'No user found with this email', code: 'auth/user-not-found' });
         }
@@ -394,8 +325,6 @@ apiRouter.post('/auth/signin', async (req, res) => {
         }
 
         const user = { uid: userRecord.id, email: userRecord.email };
-        req.session.user = user;
-
         console.log(`Successful SignIn: user ID ${userRecord.id}, email: ${userRecord.email}`);
         return res.json({ user });
     } catch (err) {
@@ -406,32 +335,32 @@ apiRouter.post('/auth/signin', async (req, res) => {
 
 // Sign Out
 apiRouter.post('/auth/logout', (req, res) => {
-    if (req.session) {
-        req.session.destroy((err) => {
-            if (err) {
-                console.error('Logout session destroy error:', err);
-                return res.status(500).json({ error: 'Failed to log out' });
-            }
-            res.clearCookie('connect.sid');
-            console.log('Successful SignOut');
-            return res.json({ success: true });
-        });
-    } else {
-        return res.json({ success: true });
-    }
+    return res.json({ success: true });
 });
 
 // Check Session / Current User
-apiRouter.get('/auth/me', (req, res) => {
-    return res.json({ user: req.session.user || null });
+apiRouter.get('/auth/me', async (req, res) => {
+    const userId = getReqUserId(req);
+    if (!userId) {
+        return res.json({ user: null });
+    }
+    try {
+        const [users] = await pool.query('SELECT id, email FROM users WHERE id = ?', [userId]);
+        if (users.length > 0) {
+            return res.json({ user: { uid: users[0].id, email: users[0].email } });
+        }
+        return res.json({ user: null });
+    } catch (e) {
+        return res.json({ user: null });
+    }
 });
 
 // Load User Data (Cart & Wishlist)
 apiRouter.get('/user/data', async (req, res) => {
-    if (!req.session.user) {
+    const userId = getReqUserId(req);
+    if (!userId) {
         return res.json({ cart: [], wishlist: [] });
     }
-    const userId = req.session.user.uid;
     try {
         const [cartRows] = await pool.query(
             'SELECT c.painting_id as id, c.qty, p.price FROM cart_items c JOIN paintings p ON c.painting_id = p.id WHERE c.user_id = ?',
@@ -461,10 +390,10 @@ apiRouter.get('/user/data', async (req, res) => {
 
 // Save User Data (Cart & Wishlist)
 apiRouter.post('/user/data', async (req, res) => {
-    if (!req.session.user) {
+    const userId = getReqUserId(req);
+    if (!userId) {
         return res.status(401).json({ error: 'Unauthorized user action' });
     }
-    const userId = req.session.user.uid;
     const { cart, wishlist } = req.body;
 
     const connection = await pool.getConnection();
@@ -512,10 +441,8 @@ apiRouter.post('/user/data', async (req, res) => {
 
 // GET /cart - Fetch user cart
 apiRouter.get('/cart', async (req, res) => {
-    if (!req.session.user) {
-        return res.json([]);
-    }
-    const userId = req.session.user.uid;
+    const userId = getReqUserId(req);
+    if (!userId) return res.json([]);
     try {
         const [cartRows] = await pool.query(
             'SELECT c.painting_id as id, c.qty, p.price FROM cart_items c JOIN paintings p ON c.painting_id = p.id WHERE c.user_id = ?',
@@ -535,19 +462,13 @@ apiRouter.get('/cart', async (req, res) => {
 
 // POST /cart - Add painting to cart
 apiRouter.post('/cart', async (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const userId = req.session.user.uid;
+    const userId = getReqUserId(req);
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
     const { paintingId, qty } = req.body;
-    if (!paintingId) {
-        return res.status(400).json({ error: 'paintingId is required' });
-    }
+    if (!paintingId) return res.status(400).json({ error: 'paintingId is required' });
     try {
         const [paintings] = await pool.query('SELECT * FROM paintings WHERE id = ?', [paintingId]);
-        if (paintings.length === 0) {
-            return res.status(400).json({ error: 'Invalid painting ID' });
-        }
+        if (paintings.length === 0) return res.status(400).json({ error: 'Invalid painting ID' });
         await pool.query(
             'INSERT INTO cart_items (user_id, painting_id, qty) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE qty = ?',
             [userId, paintingId, qty || 1, qty || 1]
@@ -561,15 +482,11 @@ apiRouter.post('/cart', async (req, res) => {
 
 // PUT /cart/:itemId - Update item quantity
 apiRouter.put('/cart/:itemId', async (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const userId = req.session.user.uid;
+    const userId = getReqUserId(req);
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
     const paintingId = req.params.itemId;
     const { qty } = req.body;
-    if (qty === undefined || qty <= 0) {
-        return res.status(400).json({ error: 'Invalid quantity' });
-    }
+    if (qty === undefined || qty <= 0) return res.status(400).json({ error: 'Invalid quantity' });
     try {
         await pool.query(
             'UPDATE cart_items SET qty = ? WHERE user_id = ? AND painting_id = ?',
@@ -584,10 +501,8 @@ apiRouter.put('/cart/:itemId', async (req, res) => {
 
 // DELETE /cart/:itemId - Remove item from cart
 apiRouter.delete('/cart/:itemId', async (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const userId = req.session.user.uid;
+    const userId = getReqUserId(req);
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
     const paintingId = req.params.itemId;
     try {
         await pool.query(
@@ -603,10 +518,8 @@ apiRouter.delete('/cart/:itemId', async (req, res) => {
 
 // DELETE /cart - Clear user cart
 apiRouter.delete('/cart', async (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const userId = req.session.user.uid;
+    const userId = getReqUserId(req);
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
     try {
         await pool.query('DELETE FROM cart_items WHERE user_id = ?', [userId]);
         return res.json({ success: true });
@@ -622,10 +535,8 @@ apiRouter.delete('/cart', async (req, res) => {
 
 // GET /wishlist - Fetch user wishlist
 apiRouter.get('/wishlist', async (req, res) => {
-    if (!req.session.user) {
-        return res.json([]);
-    }
-    const userId = req.session.user.uid;
+    const userId = getReqUserId(req);
+    if (!userId) return res.json([]);
     try {
         const [wishlistRows] = await pool.query(
             'SELECT painting_id as id FROM wishlist_items WHERE user_id = ?',
@@ -643,19 +554,13 @@ apiRouter.get('/wishlist', async (req, res) => {
 
 // POST /wishlist - Add painting to wishlist
 apiRouter.post('/wishlist', async (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const userId = req.session.user.uid;
+    const userId = getReqUserId(req);
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
     const { paintingId } = req.body;
-    if (!paintingId) {
-        return res.status(400).json({ error: 'paintingId is required' });
-    }
+    if (!paintingId) return res.status(400).json({ error: 'paintingId is required' });
     try {
         const [paintings] = await pool.query('SELECT * FROM paintings WHERE id = ?', [paintingId]);
-        if (paintings.length === 0) {
-            return res.status(400).json({ error: 'Invalid painting ID' });
-        }
+        if (paintings.length === 0) return res.status(400).json({ error: 'Invalid painting ID' });
         await pool.query(
             'INSERT IGNORE INTO wishlist_items (user_id, painting_id) VALUES (?, ?)',
             [userId, paintingId]
@@ -669,10 +574,8 @@ apiRouter.post('/wishlist', async (req, res) => {
 
 // DELETE /wishlist/:productId - Remove painting from wishlist
 apiRouter.delete('/wishlist/:productId', async (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const userId = req.session.user.uid;
+    const userId = getReqUserId(req);
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
     const paintingId = req.params.productId;
     try {
         await pool.query(
@@ -686,44 +589,9 @@ apiRouter.delete('/wishlist/:productId', async (req, res) => {
     }
 });
 
-// Mount the API Router under BOTH /api and / to handle all Vercel route patterns
+// Mount the API Router under BOTH /api and /
 app.use('/api', apiRouter);
 app.use('/', apiRouter);
-
-// ------------------------------------------------------------
-// HTML Page Routes
-// ------------------------------------------------------------
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'homepage.html'));
-});
-
-app.get('/homepage.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'homepage.html'));
-});
-
-app.get('/gallerypage.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'gallerypage.html'));
-});
-
-app.get('/cartpage.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'cartpage.html'));
-});
-
-app.get('/wishlistpage.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'wishlistpage.html'));
-});
-
-app.get('/signin.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'signin.html'));
-});
-
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'admin.html'));
-});
-
-app.get('/admin.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'admin.html'));
-});
 
 // Export the Express app for Vercel serverless
 module.exports = app;

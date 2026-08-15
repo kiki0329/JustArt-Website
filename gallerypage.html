@@ -234,11 +234,6 @@
                     <h1 class="section-title">All Paintings</h1>
                     <p class="section-sub" id="gallerySub">Explore our full collection</p>
                 </div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                    <select id="categoryFilter" style="padding:8px 16px;border-radius:30px;border:1px solid var(--border-color);background:var(--warm-white);font-size:14px;color:var(--primary);">
-                        <option value="all">All Categories</option>
-                    </select>
-                </div>
             </div>
             <div class="product-grid" id="galleryGrid"></div>
         </main>
@@ -259,8 +254,7 @@
     <script type="module">
         import { watchAuth, loadUserData, saveUserData, logOut, apiAddToCart, apiRemoveFromCart, apiAddToWishlist, apiRemoveFromWishlist, fetchPaintings, defaultPaintings } from './db-common.js';
 
-        let paintings = defaultPaintings;
-        let categories = [...new Set(paintings.map(p => p.category))];
+        let paintings = [];
 
         function loadState(key, defaultVal) {
             try { const data = localStorage.getItem(key); return data ? JSON.parse(data) : defaultVal; } catch { return defaultVal; }
@@ -278,7 +272,7 @@
             if (currentUser) {
                 try { await saveUserData(currentUser.uid, { cart, wishlist }); }
                 catch (e) {
-                    console.error('Firestore save failed', e);
+                    console.error('Save failed', e);
                     showToast('⚠️ Could not sync to your account — saved locally only.');
                 }
             }
@@ -293,7 +287,6 @@
         const searchBtn = $('searchBtn');
         const galleryGrid = $('galleryGrid');
         const gallerySub = $('gallerySub');
-        const categoryFilter = $('categoryFilter');
 
         function showToast(msg) {
             toastEl.textContent = msg;
@@ -308,11 +301,6 @@
         function isInWishlist(id) { return wishlist.some(i => i.id === id); }
         function getCartCount() { return cart.reduce((sum, i) => sum + i.qty, 0); }
 
-        function getCatIcon(cat) {
-            const map = { 'Landscape': '🏔️', 'Portrait': '👤', 'Abstract': '🌀', 'Expressionism': '🎭', 'Impressionism': '🌅', 'Surrealism': '🌙', 'Seascape': '🌊', 'Contemporary': '✨', 'Floral': '🌸' };
-            return map[cat] || '🎨';
-        }
-
         function renderProductCard(p) {
             const inCart = isInCart(p.id);
             const inWish = isInWishlist(p.id);
@@ -324,8 +312,6 @@
                     </div>
                     <div class="product-info">
                         <div class="title">${p.title}</div>
-                        <div class="artist">by ${p.artist}</div>
-                        <span class="category-tag">${p.category}</span>
                         <div class="price-row">
                             <span class="price">${formatPrice(p.price)}</span>
                             <button class="add-cart-btn ${inCart ? 'added' : ''}" data-id="${p.id}">${inCart ? '✓ In Cart' : '🛒 Add'}</button>
@@ -337,38 +323,26 @@
 
         function renderGallery() {
             const params = new URLSearchParams(window.location.search);
-            let category = params.get('category') || 'all';
             let search = params.get('search') || '';
 
-            categoryFilter.value = category;
-
             let filtered = [...paintings];
-            if (category !== 'all') {
-                filtered = filtered.filter(p => p.category === category);
-            }
             if (search.trim()) {
                 const q = search.trim().toLowerCase();
-                filtered = filtered.filter(p =>
-                    p.title.toLowerCase().includes(q) ||
-                    p.artist.toLowerCase().includes(q) ||
-                    p.category.toLowerCase().includes(q)
-                );
+                filtered = filtered.filter(p => p.title.toLowerCase().includes(q));
                 searchInput.value = search;
             }
 
             galleryGrid.innerHTML = filtered.length ?
                 filtered.map(p => renderProductCard(p)).join('') :
                 `<div style="grid-column:1/-1;text-align:center;padding:40px 0;color:var(--secondary);">
-                    <div style="font-size:40px;margin-bottom:8px;">🔍</div>
-                    <h3 style="font-size:20px;color:var(--primary);">No paintings found</h3>
-                    <p>Try adjusting your search or category filter.</p>
+                    <div style="font-size:40px;margin-bottom:8px;">🎨</div>
+                    <h3 style="font-size:20px;color:var(--primary);margin-bottom:6px;">No paintings found</h3>
+                    <p style="margin-bottom:12px;">Start uploading your collection in the Admin Studio.</p>
+                    <a href="admin.html" style="color:var(--accent);font-weight:600;">Go to Admin Studio →</a>
                 </div>`;
             gallerySub.textContent = filtered.length ?
-                `Showing ${filtered.length} of ${paintings.length} works` :
+                `Showing ${filtered.length} of ${paintings.length} original works` :
                 'No matches found';
-
-            const opts = categories.map(c => `<option value="${c}" ${c === category ? 'selected' : ''}>${c}</option>`).join('');
-            categoryFilter.innerHTML = `<option value="all">All Categories</option>` + opts;
         }
 
         function updateBadges() {
@@ -480,30 +454,13 @@
 
         function doSearch() {
             const query = searchInput.value.trim();
-            const currentCategory = categoryFilter.value;
             let url = 'gallerypage.html';
-            const params = new URLSearchParams();
-            if (query) params.set('search', query);
-            if (currentCategory !== 'all') params.set('category', currentCategory);
-            const queryString = params.toString();
-            if (queryString) url += '?' + queryString;
+            if (query) url += '?search=' + encodeURIComponent(query);
             location.href = url;
         }
 
         searchBtn.addEventListener('click', doSearch);
         searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
-
-        categoryFilter.addEventListener('change', function() {
-            const cat = this.value;
-            const search = searchInput.value.trim();
-            let url = 'gallerypage.html';
-            const params = new URLSearchParams();
-            if (search) params.set('search', search);
-            if (cat !== 'all') params.set('category', cat);
-            const queryString = params.toString();
-            if (queryString) url += '?' + queryString;
-            location.href = url;
-        });
 
         watchAuth(async (user) => {
             currentUser = user;
@@ -518,8 +475,7 @@
                     saveState('justart_cart', cart);
                     saveState('justart_wishlist', wishlist);
                 } catch (e) {
-                    console.error('MySQL load failed, using local cache', e);
-                    showToast('⚠️ Could not reach your saved data — using local cache.');
+                    console.error('Load failed, using local cache', e);
                 }
             } else {
                 cart = loadState('justart_cart', []);
@@ -533,9 +489,8 @@
         async function init() {
             try {
                 paintings = await fetchPaintings();
-                categories = [...new Set(paintings.map(p => p.category))];
             } catch (e) {
-                console.warn('Using default paintings', e);
+                console.warn('Error loading paintings', e);
             }
             renderGallery();
             updateBadges();
@@ -543,7 +498,6 @@
             document.querySelector('.nav-links a[href="gallerypage.html"]')?.classList.add('active');
             const params = new URLSearchParams(window.location.search);
             if (params.has('search')) searchInput.value = params.get('search');
-            if (params.has('category')) categoryFilter.value = params.get('category');
         }
 
         if (document.readyState === 'loading') {
