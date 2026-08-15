@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Just Art — Buy Original Paintings & Fine Art Online</title>
+    <meta name="description"
+        content="Discover and buy original paintings at Just Art. Browse landscapes, portraits, abstract art, and more from talented artists worldwide. Free collection of 200+ curated artworks." />
+    <meta name="keywords"
+        content="buy paintings online, original art, fine art, landscape paintings, portrait art, abstract paintings, art gallery" />
+    <link rel="canonical" href="homepage.html" />
+    <link rel="icon" href="logo.png" type="image/png" />
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Just Art",
+      "description": "Discover and buy original paintings at Just Art. Browse landscapes, portraits, abstract art, and more from talented artists worldwide.",
+      "url": "homepage.html",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "gallerypage.html?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Just Art",
+      "description": "Online art gallery featuring original paintings from talented artists worldwide.",
+      "url": "homepage.html",
+      "logo": "logo.png",
+      "sameAs": []
+    }
+    </script>
+    <!-- Open Graph (Social Media Sharing) -->
+    <meta property="og:title" content="Just Art — Buy Original Paintings & Fine Art Online" />
+    <meta property="og:description"
+        content="Discover and buy original paintings from talented artists worldwide. Browse landscapes, portraits, abstract art, and more." />
+    <meta property="og:image" content="logo.png" />
+    <meta property="og:type" content="website" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Just Art — Buy Original Paintings & Fine Art Online" />
+    <meta name="twitter:description" content="Discover and buy original paintings from talented artists worldwide." />
+    <style>
+        /* ----- RESET & BASE (Blue Theme) ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #F0F4F8;
+            color: #1E293B;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            background: none;
+        }
+
+        input,
+        select {
+            font-family: inherit;
+            outline: none;
+            border: none;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #E2E8F0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #94A3B8;
+            border-radius: 4px;
+        }
+
+        :root {
+            --primary: #1E293B;
+            --secondary: #334155;
+            --accent: #3B82F6;
+            --accent-hover: #2563EB;
+            --accent-light: #DBEAFE;
+            --cream: #F8FAFC;
+            --warm-white: #F1F5F9;
+            --shadow: 0 10px 40px rgba(30, 41, 59, 0.08);
+            --radius: 12px;
+            --transition: 0.35s ease;
+            --border-color: #E2E8F0;
+        }
+
+        /* ----- LAYOUT ----- */
+        .app {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
+        }
+
+        /* ----- HEADER / NAV ----- */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0 16px;
+            border-bottom: 2px solid var(--accent-light);
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            position: sticky;
+            top: 0;
+            background: rgba(248, 250, 252, 0.94);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            mix-blend-mode: multiply;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-family: 'Georgia', serif;
+            padding-right: 16px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            color: var(--primary);
+        }
+
+        .nav-links a {
+            padding: 4px 0;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            border-bottom-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .search-wrap {
+            display: flex;
+            align-items: center;
+            background: var(--warm-white);
+            border-radius: 40px;
+            padding: 4px 16px 4px 18px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .search-wrap:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+
+        .search-wrap input {
+            background: transparent;
+            padding: 8px 6px;
+            font-size: 14px;
+            width: 150px;
+            color: var(--primary);
+        }
+
+        .search-wrap input::placeholder {
+            color: #94A3B8;
+            font-style: italic;
+        }
+
+        .search-wrap button {
+            font-size: 18px;
+            color: var(--secondary);
+            padding: 4px 0 4px 8px;
+            transition: var(--transition);
+        }
+
+        .search-wrap button:hover {
+            color: var(--accent);
+        }
+
+        .icon-btn {
+            font-size: 22px;
+            position: relative;
+            color: var(--primary);
+            transition: var(--transition);
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Arial', sans-serif;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        }
+
+        .login-btn {
+            background: var(--primary);
+            color: #fff;
+            padding: 8px 22px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            transition: var(--transition);
+        }
+
+        .login-btn:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        /* ----- PAGE CONTENT ----- */
+        .page {
+            animation: fadeUp 0.5s ease forwards;
+            padding-top: 30px;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ----- HERO (Blue Gradient) ----- */
+        .hero {
+            background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+            border-radius: var(--radius);
+            padding: 60px 50px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            flex: 1 1 300px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            line-height: 1.15;
+            margin-bottom: 12px;
+        }
+
+        .hero-content h1 span {
+            color: #60A5FA;
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            color: #CBD5E1;
+            max-width: 460px;
+            margin-bottom: 24px;
+            font-style: italic;
+        }
+
+        .hero-btn {
+            background: var(--accent);
+            color: #fff;
+            padding: 14px 40px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            display: inline-block;
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+            background: var(--accent-hover);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-stats div {
+            text-align: center;
+        }
+
+        .hero-stats .num {
+            font-size: 28px;
+            font-weight: 700;
+            color: #60A5FA;
+            display: block;
+        }
+
+        .hero-stats .label {
+            font-size: 13px;
+            color: #CBD5E1;
+            letter-spacing: 1px;
+        }
+
+        /* ----- SECTION TITLES ----- */
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
+            margin-top: 6px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .section-sub {
+            color: var(--secondary);
+            font-style: italic;
+            font-size: 15px;
+        }
+
+        /* ----- CATEGORIES ----- */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 50px;
+        }
+
+        .cat-card {
+            background: var(--warm-white);
+            border-radius: var(--radius);
+            padding: 18px 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            cursor: pointer;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            color: var(--primary);
+        }
+
+        .cat-card:hover {
+            border-color: var(--accent);
+            background: #fff;
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+
+        .cat-card .cat-icon {
+            font-size: 30px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .cat-card.active {
+            border-color: var(--accent);
+            background: #fff;
+            box-shadow: var(--shadow);
+        }
+
+        /* ----- PRODUCT GRID ----- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 28px;
+            margin-bottom: 40px;
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(30, 41, 59, 0.06);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+        }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent-light);
+        }
+
+        .product-img {
+            height: 280px;
+            background: #E2E8F0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #F8FAFC;
+        }
+
+        .product-img .wishlist-toggle {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: var(--transition);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            color: #94A3B8;
+            z-index: 2;
+        }
+
+        .product-img .wishlist-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .product-img .wishlist-toggle.liked {
+            color: #EF4444;
+        }
+
+        .product-info {
+            padding: 18px 18px 20px;
+        }
+
+        .product-info .title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+
+        .product-info .artist {
+            font-size: 14px;
+            color: var(--secondary);
+            font-style: italic;
+            margin-bottom: 6px;
+        }
+
+        .product-info .category-tag {
+            display: inline-block;
+            font-size: 11px;
+            background: var(--accent-light);
+            color: var(--primary);
+            padding: 2px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .product-info .price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .product-info .price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .add-cart-btn {
+            background: var(--primary);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .add-cart-btn:hover {
+            background: var(--accent);
+            transform: scale(1.03);
+        }
+
+        .add-cart-btn.added {
+            background: #059669;
+        }
+
+        /* ----- TOAST ----- */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            box-shadow: 0 8px 30px rgba(30, 41, 59, 0.25);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 999;
+            pointer-events: none;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* ----- RESPONSIVE ----- */
+        @media (max-width: 900px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .nav-links {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 12px 20px;
+            }
+
+            .header-actions {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .search-wrap input {
+                width: 120px;
+            }
+
+            .hero {
+                padding: 36px 28px;
+                text-align: center;
+            }
+
+            .hero-content h1 {
+                font-size: 34px;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero::after {
+                display: none;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 18px;
+            }
+        }
+
+        @media (max-width: 540px) {
+            .app {
+                padding: 0 14px 40px;
+            }
+
+            .logo-text {
+                font-size: 22px;
+                padding-right: 10px;
+            }
+
+            .nav-links {
+                font-size: 13px;
+                gap: 10px 14px;
+            }
+
+            .header-actions {
+                gap: 10px;
+            }
+
+            .search-wrap input {
+                width: 80px;
+                font-size: 13px;
+            }
+
+            .hero-content h1 {
+                font-size: 26px;
+            }
+
+            .hero {
+                padding: 28px 18px;
+            }
+
+            .hero-stats {
+                gap: 20px;
+            }
+
+            .hero-stats .num {
+                font-size: 22px;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .product-img {
+                height: 200px;
+            }
+
+            .product-info {
+                padding: 12px 12px 14px;
+            }
+
+            .product-info .title {
+                font-size: 15px;
+            }
+
+            .product-info .price {
+                font-size: 17px;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+
+            .categories-grid {
+                grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+                gap: 10px;
+            }
+
+            .cat-card {
+                padding: 12px 6px;
+                font-size: 13px;
+            }
+
+            .cat-card .cat-icon {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <div class="toast" id="toast"></div>
+
+        <header class="header">
+            <a href="homepage.html" class="logo-wrap">
+                <img src="logo.png" class="logo-img" alt="Just Art Logo" />
+                <span class="logo-text">Just Art</span>
+            </a>
+            <nav class="nav-links">
+                <a href="homepage.html" class="active">Home</a>
+                <a href="gallerypage.html">Gallery</a>
+                <a href="wishlistpage.html">Wishlist</a>
+                <a href="cartpage.html">Cart</a>
+                <a href="admin.html" style="color:var(--accent);font-weight:600;">✨ Studio</a>
+            </nav>
+            <div class="header-actions">
+                <div class="search-wrap">
+                    <input type="text" id="searchInput" placeholder="Search paintings…" />
+                    <button id="searchBtn" aria-label="Search paintings">🔍</button>
+                </div>
+                <button class="icon-btn" onclick="location.href='wishlistpage.html'" aria-label="View wishlist">
+                    ♡ <span class="badge" id="wishlistBadge">0</span>
+                </button>
+                <button class="icon-btn" onclick="location.href='cartpage.html'" aria-label="View cart">
+                    🛒 <span class="badge" id="cartBadge">0</span>
+                </button>
+                <button class="login-btn" id="loginNavBtn">Sign In</button>
+            </div>
+        </header>
+
+        <main class="page">
+            <section class="hero">
+                <div class="hero-content">
+                    <h1>Where <span>Art</span> Finds a Home</h1>
+                    <p>Discover timeless original paintings. Handcrafted with passion and creativity.</p>
+                    <a href="gallerypage.html" class="hero-btn">Explore Gallery →</a>
+                </div>
+            </section>
+
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Featured Paintings</h2>
+                    <p class="section-sub">Curated original works</p>
+                </div>
+            </div>
+            <div class="product-grid" id="featuredGrid"></div>
+        </main>
+
+        <footer
+            style="text-align:center; padding:30px 0 20px; color:#94A3B8; font-size:13px; border-top:1px solid var(--border-color); margin-top:40px;">
+            <p>&copy; 2026 Just Art. All rights reserved. | Original paintings from talented artists worldwide.</p>
+            <nav aria-label="Footer navigation"
+                style="margin-top:12px;display:flex;justify-content:center;gap:18px;font-size:13px;">
+                <a href="homepage.html" style="color:#64748B;transition:color 0.3s;">Home</a>
+                <a href="gallerypage.html" style="color:#64748B;transition:color 0.3s;">Gallery</a>
+                <a href="cartpage.html" style="color:#64748B;transition:color 0.3s;">Cart</a>
+                <a href="wishlistpage.html" style="color:#64748B;transition:color 0.3s;">Wishlist</a>
+                <a href="signin.html" style="color:#64748B;transition:color 0.3s;">Sign In</a>
+                <a href="admin.html" style="color:var(--accent);transition:color 0.3s;">Admin Studio</a>
+            </nav>
+        </footer>
+    </div>
+
+    <!-- ============================================================
+         DATABASE — imports watchAuth()/logOut() from db-common.js,
+         which handles session auth and API calls to the MySQL Express server.
+       ============================================================ -->
+    <script type="module">
+        import { watchAuth, loadUserData, saveUserData, logOut, apiAddToCart, apiRemoveFromCart, apiAddToWishlist, apiRemoveFromWishlist, fetchPaintings, defaultPaintings } from './db-common.js';
+
+        window.__signOut = logOut;
+
+        // ============================================================
+        //  DATA
+        // ============================================================
+        let paintings = defaultPaintings;
+        let categories = [...new Set(paintings.map(p => p.category))];
+
+        // ============================================================
+        //  STATE (localStorage + MySQL)
+        // ============================================================
+        function loadState(key, defaultVal) {
+            try { const data = localStorage.getItem(key); return data ? JSON.parse(data) : defaultVal; } catch { return defaultVal; }
+        }
+        function saveState(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+        let cart = loadState('justart_cart', []);
+        let wishlist = loadState('justart_wishlist', []);
+        let isLoggedIn = false;
+        let currentUser = null;
+
+        async function persist() {
+            saveState('justart_cart', cart);
+            saveState('justart_wishlist', wishlist);
+            if (currentUser) {
+                try {
+                    await saveUserData(currentUser.uid, { cart, wishlist });
+                } catch (e) {
+                    console.error('MySQL save failed', e);
+                    showToast('⚠️ Could not sync to your account — saved locally only.');
+                }
+            }
+        }
+
+        // ============================================================
+        //  AUTH OBSERVER
+        // ============================================================
+        watchAuth(async (user) => {
+            currentUser = user;
+            isLoggedIn = !!user;
+            updateLoginButton();
+
+            const loginBtn = document.getElementById('loginNavBtn');
+            if (loginBtn) {
+                if (user) {
+                    loginBtn.textContent = 'Sign Out';
+                    loginBtn.dataset.loggedIn = 'true';
+                    loginBtn.title = user.email || '';
+                } else {
+                    loginBtn.textContent = 'Sign In';
+                    loginBtn.dataset.loggedIn = 'false';
+                }
+            }
+
+            if (user) {
+                try {
+                    const data = await loadUserData(user.uid, user.email);
+                    cart = data.cart;
+                    wishlist = data.wishlist;
+                    saveState('justart_cart', cart);
+                    saveState('justart_wishlist', wishlist);
+                } catch (e) {
+                    console.error('MySQL load failed, using local cache', e);
+                    showToast('⚠️ Could not reach your saved data — using local cache.');
+                }
+            } else {
+                cart = loadState('justart_cart', []);
+                wishlist = loadState('justart_wishlist', []);
+            }
+
+            renderFeatured();
+            updateBadges();
+        });
+
+        // ============================================================
+        //  DOM REFS
+        // ============================================================
+        const $ = id => document.getElementById(id);
+        const toastEl = $('toast');
+        const cartBadge = $('cartBadge');
+        const wishlistBadge = $('wishlistBadge');
+        const loginBtn = $('loginNavBtn');
+        const searchInput = $('searchInput');
+        const searchBtn = $('searchBtn');
+        const featuredGrid = $('featuredGrid');
+        const categoriesGrid = $('categoriesGrid');
+
+        // ============================================================
+        //  HELPERS
+        // ============================================================
+        function showToast(msg) {
+            toastEl.textContent = msg;
+            toastEl.classList.add('show');
+            clearTimeout(toastEl._timer);
+            toastEl._timer = setTimeout(() => toastEl.classList.remove('show'), 2600);
+        }
+
+        function formatPrice(n) {
+            return '$' + Number(n).toLocaleString('en-US');
+        }
+
+        function getPainting(id) {
+            return paintings.find(p => p.id === id);
+        }
+
+        function getCategoryCount(cat) {
+            return paintings.filter(p => p.category === cat).length;
+        }
+
+        function isInCart(id) { return cart.some(i => i.id === id); }
+        function isInWishlist(id) { return wishlist.some(i => i.id === id); }
+        function getCartCount() {
+            return cart.reduce((sum, i) => sum + i.qty, 0);
+        }
+
+        // ============================================================
+        //  RENDER
+        // ============================================================
+        function getCatIcon(cat) {
+            const map = {
+                'Landscape': '🏔️',
+                'Portrait': '👤',
+                'Abstract': '🌀',
+                'Expressionism': '🎭',
+                'Impressionism': '🌅',
+                'Surrealism': '🌙',
+                'Seascape': '🌊',
+                'Contemporary': '✨',
+                'Floral': '🌸'
+            };
+            return map[cat] || '🎨';
+        }
+
+        function renderCategories() {
+            let html = `<div class="cat-card active" data-cat="all">
+                <span class="cat-icon">🖼️</span> All
+                <span style="font-size:12px;color:var(--secondary);display:block;">${paintings.length}</span>
+            </div>`;
+            categories.forEach(cat => {
+                html += `<div class="cat-card" data-cat="${cat}">
+                    <span class="cat-icon">${getCatIcon(cat)}</span> ${cat}
+                    <span style="font-size:12px;color:var(--secondary);display:block;">${getCategoryCount(cat)}</span>
+                </div>`;
+            });
+            categoriesGrid.innerHTML = html;
+
+            document.querySelectorAll('.cat-card').forEach(card => {
+                card.addEventListener('click', function () {
+                    const cat = this.dataset.cat;
+                    if (cat === 'all') {
+                        location.href = 'gallerypage.html';
+                    } else {
+                        location.href = `gallerypage.html?category=${encodeURIComponent(cat)}`;
+                    }
+                });
+            });
+        }
+
+        function renderProductCard(p) {
+            const inCart = isInCart(p.id);
+            const inWish = isInWishlist(p.id);
+            return `
+                <div class="product-card" data-id="${p.id}">
+                    <div class="product-img">
+                        <img src="${p.image}" alt="${p.title}" loading="lazy" />
+                        <button class="wishlist-toggle ${inWish ? 'liked' : ''}" data-id="${p.id}">${inWish ? '♥' : '♡'}</button>
+                    </div>
+                    <div class="product-info">
+                        <div class="title">${p.title}</div>
+                        <div class="price-row">
+                            <span class="price">${formatPrice(p.price)}</span>
+                            <button class="add-cart-btn ${inCart ? 'added' : ''}" data-id="${p.id}">${inCart ? '✓ In Cart' : '🛒 Add'}</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFeatured() {
+            const featured = paintings.filter(p => p.featured);
+            const listToShow = featured.length ? featured : paintings.slice(0, 6);
+            if (!listToShow.length) {
+                featuredGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px 0; color: #64748B;">
+                        <p style="font-size: 18px; margin-bottom: 8px;">🎨 No paintings uploaded yet</p>
+                        <a href="admin.html" style="color: var(--accent); font-weight: 600;">Go to Admin Studio to upload your first painting →</a>
+                    </div>
+                `;
+                return;
+            }
+            featuredGrid.innerHTML = listToShow.map(p => renderProductCard(p)).join('');
+        }
+
+        function updateBadges() {
+            cartBadge.textContent = getCartCount();
+            wishlistBadge.textContent = wishlist.length;
+        }
+
+        function updateLoginButton() {
+            loginBtn.textContent = isLoggedIn ? 'Sign Out' : 'Sign In';
+        }
+
+        // ============================================================
+        //  EVENT DELEGATION
+        // ============================================================
+        document.addEventListener('click', function (e) {
+            // Wishlist toggle
+            const wishBtn = e.target.closest('.wishlist-toggle');
+            if (wishBtn) {
+                e.preventDefault();
+                const id = parseInt(wishBtn.dataset.id);
+                toggleWishlist(id);
+                return;
+            }
+
+            // Add to cart
+            const addBtn = e.target.closest('.add-cart-btn');
+            if (addBtn) {
+                e.preventDefault();
+                const id = parseInt(addBtn.dataset.id);
+                toggleCart(id);
+                return;
+            }
+
+            // Login/Logout — now checks user session auth state
+            // (set by the module script above via loginBtn.dataset.loggedIn)
+            if (e.target.id === 'loginNavBtn') {
+                const currentlyLoggedIn = e.target.dataset.loggedIn === 'true';
+                if (currentlyLoggedIn) {
+                    window.__signOut().then(() => {
+                        showToast('Signed out.');
+                    });
+                } else {
+                    location.href = 'signin.html';
+                }
+                return;
+            }
+        });
+
+        // ============================================================
+        //  CART / WISHLIST
+        // ============================================================
+        async function addToCart(id) {
+            const p = getPainting(id);
+            if (!p) return;
+            const existing = cart.find(i => i.id === id);
+            if (existing) existing.qty += 1;
+            else cart.push({ id, qty: 1, price: p.price });
+            saveState('justart_cart', cart);
+            if (currentUser) {
+                try {
+                    await apiAddToCart(id, existing ? existing.qty : 1);
+                } catch (e) {
+                    console.error('MySQL save failed', e);
+                    showToast('⚠️ Could not sync to your account — saved locally only.');
+                }
+            }
+            renderFeatured();
+            updateBadges();
+            showToast(`🛒 "${p.title}" added to cart`);
+        }
+
+        function toggleCart(id) {
+            if (isInCart(id)) removeFromCart(id);
+            else addToCart(id);
+        }
+
+        async function removeFromCart(id) {
+            const p = getPainting(id);
+            cart = cart.filter(i => i.id !== id);
+            saveState('justart_cart', cart);
+            if (currentUser) {
+                try {
+                    await apiRemoveFromCart(id);
+                } catch (e) {
+                    console.error('MySQL save failed', e);
+                }
+            }
+            renderFeatured();
+            updateBadges();
+            if (p) showToast(`🗑️ "${p.title}" removed from cart`);
+        }
+
+        async function toggleWishlist(id) {
+            const p = getPainting(id);
+            if (!p) return;
+            if (isInWishlist(id)) {
+                wishlist = wishlist.filter(i => i.id !== id);
+                saveState('justart_wishlist', wishlist);
+                if (currentUser) {
+                    try {
+                        await apiRemoveFromWishlist(id);
+                    } catch (e) {
+                        console.error('MySQL save failed', e);
+                    }
+                }
+                showToast(`♡ "${p.title}" removed from wishlist`);
+            } else {
+                wishlist.push({ id });
+                saveState('justart_wishlist', wishlist);
+                if (currentUser) {
+                    try {
+                        await apiAddToWishlist(id);
+                    } catch (e) {
+                        console.error('MySQL save failed', e);
+                    }
+                }
+                showToast(`♥ "${p.title}" added to wishlist`);
+            }
+            renderFeatured();
+            updateBadges();
+        }
+
+        // ============================================================
+        //  SEARCH
+        // ============================================================
+        function doSearch() {
+            const query = searchInput.value.trim();
+            if (query) {
+                location.href = `gallerypage.html?search=${encodeURIComponent(query)}`;
+            }
+        }
+        searchBtn.addEventListener('click', doSearch);
+        searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+        // ============================================================
+        //  INIT
+        // ============================================================
+        async function init() {
+            try {
+                paintings = await fetchPaintings();
+                categories = [...new Set(paintings.map(p => p.category))];
+            } catch (e) {
+                console.warn('Using default paintings', e);
+            }
+
+            // Check for login success param
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('login') === 'success') {
+                showToast('👋 Welcome back!');
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            renderFeatured();
+            updateBadges();
+            document.querySelector('.nav-links a[href="homepage.html"]')?.classList.add('active');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        console.log('✦ Just Art — Home');
+    </script>
+</body>
+
+</html>

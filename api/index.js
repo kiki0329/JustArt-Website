@@ -589,9 +589,55 @@ apiRouter.delete('/wishlist/:productId', async (req, res) => {
     }
 });
 
-// Mount the API Router under BOTH /api and /
+// Mount the API Router under /api
 app.use('/api', apiRouter);
+
+// Static assets and files serving
+app.use(express.static(path.join(__dirname, '..')));
+
+// Explicit page routes so any request renders the appropriate HTML page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'homepage.html'));
+});
+app.get('/index.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'homepage.html'));
+});
+app.get('/homepage.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'homepage.html'));
+});
+app.get('/gallerypage.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'gallerypage.html'));
+});
+app.get('/cartpage.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'cartpage.html'));
+});
+app.get('/wishlistpage.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'wishlistpage.html'));
+});
+app.get('/signin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'signin.html'));
+});
+app.get('/admin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'admin.html'));
+});
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'admin.html'));
+});
+app.get('/logo.png', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'logo.png'));
+});
+app.get('/db-common.js', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'db-common.js'));
+});
+
+// Also mount API router on root as fallback
 app.use('/', apiRouter);
+
+// Catch-all route to serve homepage instead of Cannot GET
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'homepage.html'));
+});
 
 // Export the Express app for Vercel serverless
 module.exports = app;
+

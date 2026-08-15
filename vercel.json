@@ -1,12 +1,13 @@
 {
   "version": 2,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "**"
+    }
+  },
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/homepage.html"
-    },
-    {
-      "source": "/api/:match*",
+      "source": "/(.*)",
       "destination": "/api/index.js"
     }
   ]
