@@ -646,13 +646,40 @@ app.get('/homepage.html', (req, res) => {
 app.get('/gallerypage.html', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'gallerypage.html'));
 });
+app.get('/gallery', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'gallerypage.html'));
+});
+app.get('/gallerypage', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'gallerypage.html'));
+});
 app.get('/cartpage.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'cartpage.html'));
+});
+app.get('/cart', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'cartpage.html'));
+});
+app.get('/cartpage', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'cartpage.html'));
 });
 app.get('/wishlistpage.html', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'wishlistpage.html'));
 });
+app.get('/wishlist', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'wishlistpage.html'));
+});
+app.get('/wishlistpage', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'wishlistpage.html'));
+});
 app.get('/signin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'signin.html'));
+});
+app.get('/signin', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'signin.html'));
+});
+app.get('/signup', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'signin.html'));
+});
+app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'signin.html'));
 });
 app.get('/admin.html', (req, res) => {
@@ -667,9 +694,12 @@ app.get('/logo.png', (req, res) => {
 app.get('/db-common.js', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'db-common.js'));
 });
-
-// Also mount API router on root as fallback
-app.use('/', apiRouter);
+app.get('/robots.txt', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'robots.txt'));
+});
+app.get('/sitemap.xml', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'sitemap.xml'));
+});
 
 // Catch-all route to serve homepage instead of Cannot GET
 app.get('*', (req, res) => {

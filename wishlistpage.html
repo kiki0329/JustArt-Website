@@ -107,6 +107,7 @@
                 <a href="gallerypage.html">Gallery</a>
                 <a href="wishlistpage.html" class="active">Wishlist</a>
                 <a href="cartpage.html">Cart</a>
+                <span id="adminNavSlot"></span>
             </nav>
             <div class="header-actions">
                 <div class="search-wrap">
@@ -141,12 +142,13 @@
                 <a href="cartpage.html" style="color:#64748B;transition:color 0.3s;">Cart</a>
                 <a href="wishlistpage.html" style="color:#64748B;transition:color 0.3s;">Wishlist</a>
                 <a href="signin.html" style="color:#64748B;transition:color 0.3s;">Sign In</a>
+                <span id="adminFooterSlot"></span>
             </nav>
         </footer>
     </div>
 
     <script type="module">
-        import { watchAuth, loadUserData, saveUserData, logOut, apiAddToCart, apiRemoveFromWishlist, fetchPaintings, defaultPaintings } from './db-common.js';
+        import { watchAuth, loadUserData, saveUserData, logOut, apiAddToCart, apiRemoveFromWishlist, fetchPaintings, defaultPaintings, isUserAdmin } from './db-common.js';
 
         let paintings = defaultPaintings;
 
@@ -166,7 +168,7 @@
             if (currentUser) {
                 try { await saveUserData(currentUser.uid, { cart, wishlist }); }
                 catch (e) {
-                    console.error('Firestore save failed', e);
+                    console.error('MySQL save failed', e);
                     showToast('⚠️ Could not sync to your account — saved locally only.');
                 }
             }
@@ -313,6 +315,17 @@
             currentUser = user;
             isLoggedIn = !!user;
             updateLoginButton();
+
+            // Show Studio link ONLY if authenticated as admin (mkiruthika659@gmail.com)
+            const adminNavSlot = document.getElementById('adminNavSlot');
+            const adminFooterSlot = document.getElementById('adminFooterSlot');
+            if (user && isUserAdmin(user)) {
+                if (adminNavSlot) adminNavSlot.innerHTML = `<a href="admin.html" style="color:var(--accent);font-weight:600;">✨ Studio</a>`;
+                if (adminFooterSlot) adminFooterSlot.innerHTML = `<a href="admin.html" style="color:var(--accent);transition:color 0.3s;">Admin Studio</a>`;
+            } else {
+                if (adminNavSlot) adminNavSlot.innerHTML = '';
+                if (adminFooterSlot) adminFooterSlot.innerHTML = '';
+            }
 
             if (user) {
                 try {

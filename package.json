@@ -1,7 +1,7 @@
 {
   "name": "just-art-server",
   "version": "1.0.0",
-  "description": "Serves the Just Art site and hands Firebase config from .env to the browser",
+  "description": "Just Art online gallery with MySQL serverless backend and admin studio",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
