@@ -211,7 +211,7 @@
                 <a href="gallerypage.html" class="active">Gallery</a>
                 <a href="wishlistpage.html">Wishlist</a>
                 <a href="cartpage.html">Cart</a>
-                <a href="admin.html" style="color:var(--accent);font-weight:600;">✨ Studio</a>
+                <span id="adminNavSlot"></span>
             </nav>
             <div class="header-actions">
                 <div class="search-wrap">
@@ -246,13 +246,13 @@
                 <a href="cartpage.html" style="color:#64748B;transition:color 0.3s;">Cart</a>
                 <a href="wishlistpage.html" style="color:#64748B;transition:color 0.3s;">Wishlist</a>
                 <a href="signin.html" style="color:#64748B;transition:color 0.3s;">Sign In</a>
-                <a href="admin.html" style="color:var(--accent);transition:color 0.3s;">Admin Studio</a>
+                <span id="adminFooterSlot"></span>
             </nav>
         </footer>
     </div>
 
     <script type="module">
-        import { watchAuth, loadUserData, saveUserData, logOut, apiAddToCart, apiRemoveFromCart, apiAddToWishlist, apiRemoveFromWishlist, fetchPaintings, defaultPaintings } from './db-common.js';
+        import { watchAuth, loadUserData, saveUserData, logOut, apiAddToCart, apiRemoveFromCart, apiAddToWishlist, apiRemoveFromWishlist, fetchPaintings, defaultPaintings, isUserAdmin } from './db-common.js';
 
         let paintings = [];
 
@@ -332,13 +332,16 @@
                 searchInput.value = search;
             }
 
+            const adminLink = (currentUser && isUserAdmin(currentUser))
+                ? `<p style="margin-bottom:12px;">Start uploading your collection in the Admin Studio.</p><a href="admin.html" style="color:var(--accent);font-weight:600;">Go to Admin Studio →</a>`
+                : `<p style="margin-bottom:4px; font-size:14px;">Please check back soon for new original paintings!</p>`;
+
             galleryGrid.innerHTML = filtered.length ?
                 filtered.map(p => renderProductCard(p)).join('') :
                 `<div style="grid-column:1/-1;text-align:center;padding:40px 0;color:var(--secondary);">
                     <div style="font-size:40px;margin-bottom:8px;">🎨</div>
                     <h3 style="font-size:20px;color:var(--primary);margin-bottom:6px;">No paintings found</h3>
-                    <p style="margin-bottom:12px;">Start uploading your collection in the Admin Studio.</p>
-                    <a href="admin.html" style="color:var(--accent);font-weight:600;">Go to Admin Studio →</a>
+                    ${adminLink}
                 </div>`;
             gallerySub.textContent = filtered.length ?
                 `Showing ${filtered.length} of ${paintings.length} original works` :
@@ -466,6 +469,17 @@
             currentUser = user;
             isLoggedIn = !!user;
             updateLoginButton();
+
+            // Show Studio link ONLY if authenticated as admin (mkiruthika659@gmail.com)
+            const adminNavSlot = document.getElementById('adminNavSlot');
+            const adminFooterSlot = document.getElementById('adminFooterSlot');
+            if (user && isUserAdmin(user)) {
+                if (adminNavSlot) adminNavSlot.innerHTML = `<a href="admin.html" style="color:var(--accent);font-weight:600;">✨ Studio</a>`;
+                if (adminFooterSlot) adminFooterSlot.innerHTML = `<a href="admin.html" style="color:var(--accent);transition:color 0.3s;">Admin Studio</a>`;
+            } else {
+                if (adminNavSlot) adminNavSlot.innerHTML = '';
+                if (adminFooterSlot) adminFooterSlot.innerHTML = '';
+            }
 
             if (user) {
                 try {

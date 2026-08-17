@@ -767,7 +767,7 @@
                 <a href="gallerypage.html">Gallery</a>
                 <a href="wishlistpage.html">Wishlist</a>
                 <a href="cartpage.html">Cart</a>
-                <a href="admin.html" style="color:var(--accent);font-weight:600;">✨ Studio</a>
+                <span id="adminNavSlot"></span>
             </nav>
             <div class="header-actions">
                 <div class="search-wrap">
@@ -812,7 +812,7 @@
                 <a href="cartpage.html" style="color:#64748B;transition:color 0.3s;">Cart</a>
                 <a href="wishlistpage.html" style="color:#64748B;transition:color 0.3s;">Wishlist</a>
                 <a href="signin.html" style="color:#64748B;transition:color 0.3s;">Sign In</a>
-                <a href="admin.html" style="color:var(--accent);transition:color 0.3s;">Admin Studio</a>
+                <span id="adminFooterSlot"></span>
             </nav>
         </footer>
     </div>
@@ -822,7 +822,7 @@
          which handles session auth and API calls to the MySQL Express server.
        ============================================================ -->
     <script type="module">
-        import { watchAuth, loadUserData, saveUserData, logOut, apiAddToCart, apiRemoveFromCart, apiAddToWishlist, apiRemoveFromWishlist, fetchPaintings, defaultPaintings } from './db-common.js';
+        import { watchAuth, loadUserData, saveUserData, logOut, apiAddToCart, apiRemoveFromCart, apiAddToWishlist, apiRemoveFromWishlist, fetchPaintings, defaultPaintings, isUserAdmin } from './db-common.js';
 
         window.__signOut = logOut;
 
@@ -876,6 +876,17 @@
                     loginBtn.textContent = 'Sign In';
                     loginBtn.dataset.loggedIn = 'false';
                 }
+            }
+
+            // Show Studio link ONLY if authenticated as admin (mkiruthika659@gmail.com)
+            const adminNavSlot = document.getElementById('adminNavSlot');
+            const adminFooterSlot = document.getElementById('adminFooterSlot');
+            if (user && isUserAdmin(user)) {
+                if (adminNavSlot) adminNavSlot.innerHTML = `<a href="admin.html" style="color:var(--accent);font-weight:600;">✨ Studio</a>`;
+                if (adminFooterSlot) adminFooterSlot.innerHTML = `<a href="admin.html" style="color:var(--accent);transition:color 0.3s;">Admin Studio</a>`;
+            } else {
+                if (adminNavSlot) adminNavSlot.innerHTML = '';
+                if (adminFooterSlot) adminFooterSlot.innerHTML = '';
             }
 
             if (user) {
@@ -1006,10 +1017,13 @@
             const featured = paintings.filter(p => p.featured);
             const listToShow = featured.length ? featured : paintings.slice(0, 6);
             if (!listToShow.length) {
+                const adminLink = (currentUser && isUserAdmin(currentUser))
+                    ? `<a href="admin.html" style="color: var(--accent); font-weight: 600; display:inline-block; margin-top:8px;">Go to Admin Studio to upload paintings →</a>`
+                    : `<p style="font-size: 14px; margin-top: 4px;">Check back soon for new original artworks!</p>`;
                 featuredGrid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 40px 0; color: #64748B;">
-                        <p style="font-size: 18px; margin-bottom: 8px;">🎨 No paintings uploaded yet</p>
-                        <a href="admin.html" style="color: var(--accent); font-weight: 600;">Go to Admin Studio to upload your first painting →</a>
+                        <p style="font-size: 18px; margin-bottom: 4px;">🎨 No paintings uploaded yet</p>
+                        ${adminLink}
                     </div>
                 `;
                 return;

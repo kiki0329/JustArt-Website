@@ -4,21 +4,34 @@
 //  Stateless, serverless-ready, and client-synced.
 // ============================================================
 
+export const ADMIN_EMAIL = 'mkiruthika659@gmail.com';
+
 export const dbReady = Promise.resolve({});
 
 const listeners = [];
 let cachedUser = null;
+
+export function isUserAdmin(user) {
+    if (!user || !user.email) return false;
+    return user.email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
+}
 
 // Initialize cached user from localStorage immediately
 try {
     const stored = localStorage.getItem('justart_user');
     if (stored) {
         cachedUser = JSON.parse(stored);
+        if (cachedUser) {
+            cachedUser.isAdmin = isUserAdmin(cachedUser);
+        }
     }
 } catch (e) {}
 
 // Triggers callbacks registered by watchAuth
 function notifyListeners(user) {
+    if (user) {
+        user.isAdmin = isUserAdmin(user);
+    }
     cachedUser = user;
     if (user) {
         try { localStorage.setItem('justart_user', JSON.stringify(user)); } catch (e) {}
@@ -35,7 +48,7 @@ function notifyListeners(user) {
 }
 
 // Get user auth headers
-function getAuthHeaders() {
+export function getAuthHeaders() {
     const headers = { 'Content-Type': 'application/json' };
     if (cachedUser && cachedUser.uid) {
         headers['x-user-id'] = String(cachedUser.uid);
@@ -52,14 +65,7 @@ export function watchAuth(callback) {
     callback(cachedUser);
 }
 
-export const defaultPaintings = [
-    { id: 1, title: 'Whispers of Dawn', price: 549, image: 'whispers_of_dawn.jpg', featured: true },
-    { id: 2, title: 'Eternal Silence', price: 799, image: 'eternal_silence.jpg', featured: true },
-    { id: 3, title: 'Crimson Horizon', price: 649, image: 'crimson_horizon.jpg', featured: true },
-    { id: 4, title: 'Dancing Shadows', price: 729, image: 'dancing_shadows.jpg', featured: true },
-    { id: 5, title: 'Golden Afternoon', price: 499, image: 'golden_afternoon.jpg', featured: true },
-    { id: 6, title: 'Midnight Reverie', price: 879, image: 'midnight_reverie.jpg', featured: true }
-];
+export const defaultPaintings = [];
 
 // ============================================================
 // Paintings Management (Dynamic API with MySQL)
@@ -80,23 +86,23 @@ export async function fetchPaintings(options = {}) {
             throw new Error(`Failed to fetch paintings: ${res.status}`);
         }
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
             return data;
         }
-        return defaultPaintings;
+        return [];
     } catch (err) {
-        console.warn('Error fetching paintings, using local default:', err.message);
-        return defaultPaintings;
+        console.warn('Error fetching paintings:', err.message);
+        return [];
     }
 }
 
 /**
- * Add a new painting to MySQL.
+ * Add a new painting to MySQL (Admin only).
  */
 export async function apiAddPainting(paintingData) {
     const res = await fetch('/api/paintings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(paintingData)
     });
     const data = await res.json();
@@ -107,12 +113,12 @@ export async function apiAddPainting(paintingData) {
 }
 
 /**
- * Update an existing painting in MySQL.
+ * Update an existing painting in MySQL (Admin only).
  */
 export async function apiUpdatePainting(id, paintingData) {
     const res = await fetch(`/api/paintings/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(paintingData)
     });
     const data = await res.json();
@@ -123,11 +129,12 @@ export async function apiUpdatePainting(id, paintingData) {
 }
 
 /**
- * Delete a painting from MySQL.
+ * Delete a painting from MySQL (Admin only).
  */
 export async function apiDeletePainting(id) {
     const res = await fetch(`/api/paintings/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
     });
     const data = await res.json();
     if (!res.ok) {

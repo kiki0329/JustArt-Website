@@ -49,6 +49,23 @@ const pool = mysql.createPool({
     ssl: isCloudDb ? { rejectUnauthorized: false } : undefined
 });
 
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'mkiruthika659@gmail.com').trim().toLowerCase();
+
+// Helper to check if request user is admin
+async function isReqAdmin(req) {
+    const userId = getReqUserId(req);
+    if (!userId) return false;
+    try {
+        const [users] = await pool.query('SELECT email FROM users WHERE id = ?', [userId]);
+        if (users.length > 0 && users[0].email.trim().toLowerCase() === ADMIN_EMAIL) {
+            return true;
+        }
+    } catch (e) {
+        console.error('Error checking admin user:', e);
+    }
+    return false;
+}
+
 // Automatically create database and tables if they don't exist
 async function initializeDatabase() {
     try {
@@ -105,30 +122,10 @@ async function initializeDatabase() {
             await pool.query('ALTER TABLE paintings MODIFY image_url MEDIUMTEXT NOT NULL;');
         } catch (e) {}
 
-        // Remove old dummy internet paintings with picsum links so only real art is shown
+        // Remove old dummy internet paintings and old starter .jpg records
         try {
-            await pool.query("DELETE FROM paintings WHERE image_url LIKE '%picsum.photos%'");
+            await pool.query("DELETE FROM paintings WHERE image_url LIKE '%picsum.photos%' OR image_url LIKE '%.jpg'");
         } catch (e) {}
-
-        // Check if paintings table is empty; if so, populate with real artworks
-        const [existingPaintings] = await pool.query('SELECT COUNT(*) as cnt FROM paintings');
-        if (existingPaintings[0].cnt === 0) {
-            const seedItems = [
-                [1, 'Whispers of Dawn', 549, 'whispers_of_dawn.jpg', 1],
-                [2, 'Eternal Silence', 799, 'eternal_silence.jpg', 1],
-                [3, 'Crimson Horizon', 649, 'crimson_horizon.jpg', 1],
-                [4, 'Dancing Shadows', 729, 'dancing_shadows.jpg', 1],
-                [5, 'Golden Afternoon', 499, 'golden_afternoon.jpg', 1],
-                [6, 'Midnight Reverie', 879, 'midnight_reverie.jpg', 1]
-            ];
-            for (const item of seedItems) {
-                await pool.query(
-                    'INSERT IGNORE INTO paintings (id, title, artist, category, price, image_url, featured) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                    [item[0], item[1], '', 'Original', item[2], item[3], item[4]]
-                );
-            }
-            console.log('Seeded 6 real paintings into MySQL database.');
-        }
 
         console.log('Database tables verified/created successfully.');
     } catch (err) {
@@ -218,8 +215,13 @@ apiRouter.get('/paintings/:id', async (req, res) => {
     }
 });
 
-// POST /api/paintings - Add a new painting
+// POST /api/paintings - Add a new painting (Admin only)
 apiRouter.post('/paintings', async (req, res) => {
+    const isAdmin = await isReqAdmin(req);
+    if (!isAdmin) {
+        return res.status(403).json({ error: 'Access denied: Only the administrator can add paintings.' });
+    }
+
     const { title, price, image, featured } = req.body;
     if (!title || price === undefined || !image) {
         return res.status(400).json({ error: 'Title, price, and image are required' });
@@ -247,8 +249,13 @@ apiRouter.post('/paintings', async (req, res) => {
     }
 });
 
-// PUT /api/paintings/:id - Update an existing painting
+// PUT /api/paintings/:id - Update an existing painting (Admin only)
 apiRouter.put('/paintings/:id', async (req, res) => {
+    const isAdmin = await isReqAdmin(req);
+    if (!isAdmin) {
+        return res.status(403).json({ error: 'Access denied: Only the administrator can update paintings.' });
+    }
+
     const id = req.params.id;
     const { title, price, image, featured } = req.body;
     if (!title || price === undefined || !image) {
@@ -278,8 +285,13 @@ apiRouter.put('/paintings/:id', async (req, res) => {
     }
 });
 
-// DELETE /api/paintings/:id - Delete a painting
+// DELETE /api/paintings/:id - Delete a painting (Admin only)
 apiRouter.delete('/paintings/:id', async (req, res) => {
+    const isAdmin = await isReqAdmin(req);
+    if (!isAdmin) {
+        return res.status(403).json({ error: 'Access denied: Only the administrator can delete paintings.' });
+    }
+
     const id = req.params.id;
     try {
         const [result] = await pool.query('DELETE FROM paintings WHERE id = ?', [id]);
@@ -308,17 +320,19 @@ apiRouter.post('/auth/signup', async (req, res) => {
         return res.status(400).json({ error: 'Password must be at least 6 characters', code: 'auth/weak-password' });
     }
     try {
-        const [existing] = await pool.query('SELECT * FROM users WHERE email = ?', [email.trim().toLowerCase()]);
+        const userEmail = email.trim().toLowerCase();
+        const [existing] = await pool.query('SELECT * FROM users WHERE email = ?', [userEmail]);
         if (existing.length > 0) {
             return res.status(400).json({ error: 'Email already in use', code: 'auth/email-already-in-use' });
         }
 
         const hash = await bcrypt.hash(password, 10);
-        const [result] = await pool.query('INSERT INTO users (email, password_hash) VALUES (?, ?)', [email.trim().toLowerCase(), hash]);
+        const [result] = await pool.query('INSERT INTO users (email, password_hash) VALUES (?, ?)', [userEmail, hash]);
         const userId = result.insertId;
 
-        const user = { uid: userId, email: email.trim().toLowerCase() };
-        console.log(`Successful SignUp: user ID ${userId}, email: ${user.email}`);
+        const isAdmin = userEmail === ADMIN_EMAIL;
+        const user = { uid: userId, email: userEmail, isAdmin };
+        console.log(`Successful SignUp: user ID ${userId}, email: ${user.email}, isAdmin: ${isAdmin}`);
         return res.json({ user });
     } catch (err) {
         console.error('Signup error:', err);
@@ -333,7 +347,8 @@ apiRouter.post('/auth/signin', async (req, res) => {
         return res.status(400).json({ error: 'Email and password are required', code: 'auth/invalid-credential' });
     }
     try {
-        const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email.trim().toLowerCase()]);
+        const userEmail = email.trim().toLowerCase();
+        const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [userEmail]);
         if (users.length === 0) {
             return res.status(400).json({ error: 'No user found with this email', code: 'auth/user-not-found' });
         }
@@ -344,8 +359,9 @@ apiRouter.post('/auth/signin', async (req, res) => {
             return res.status(400).json({ error: 'Incorrect password', code: 'auth/wrong-password' });
         }
 
-        const user = { uid: userRecord.id, email: userRecord.email };
-        console.log(`Successful SignIn: user ID ${userRecord.id}, email: ${userRecord.email}`);
+        const isAdmin = userEmail === ADMIN_EMAIL;
+        const user = { uid: userRecord.id, email: userRecord.email, isAdmin };
+        console.log(`Successful SignIn: user ID ${userRecord.id}, email: ${userRecord.email}, isAdmin: ${isAdmin}`);
         return res.json({ user });
     } catch (err) {
         console.error('Signin error:', err);
@@ -367,7 +383,9 @@ apiRouter.get('/auth/me', async (req, res) => {
     try {
         const [users] = await pool.query('SELECT id, email FROM users WHERE id = ?', [userId]);
         if (users.length > 0) {
-            return res.json({ user: { uid: users[0].id, email: users[0].email } });
+            const userEmail = users[0].email.trim().toLowerCase();
+            const isAdmin = userEmail === ADMIN_EMAIL;
+            return res.json({ user: { uid: users[0].id, email: users[0].email, isAdmin } });
         }
         return res.json({ user: null });
     } catch (e) {

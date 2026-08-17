@@ -228,24 +228,89 @@
         .toast.success { background: #065F46; border-left: 4px solid #10B981; }
         .toast.error { background: #991B1B; border-left: 4px solid #EF4444; }
 
-        /* Loader */
-        .loading-state { text-align: center; padding: 50px 0; color: #64748B; font-size: 15px; }
-        .spinner {
-            width: 36px; height: 36px; border: 3px solid #E2E8F0;
-            border-top-color: var(--accent); border-radius: 50%;
-            animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+        /* Auth Barrier Screen */
+        .auth-barrier {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .barrier-card {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 40px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+        .barrier-icon {
+            font-size: 50px;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+        .barrier-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+        .barrier-desc {
+            color: #64748B;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .barrier-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .admin-user-pill {
+            background: #EFF6FF;
+            color: #1E40AF;
+            border: 1px solid #BFDBFE;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
-    <div class="admin-layout">
+    <!-- Auth Barrier (Shown when not logged in as Admin) -->
+    <div id="authBarrier" class="auth-barrier" style="display: none;">
+        <div class="barrier-card">
+            <div class="barrier-icon">🔒</div>
+            <h2 class="barrier-title">Admin Studio Restricted</h2>
+            <p class="barrier-desc">
+                Access to the Studio and painting management is strictly reserved for the gallery administrator (<strong>mkiruthika659@gmail.com</strong>).
+            </p>
+            <div class="barrier-actions">
+                <a href="signin.html?redirect=admin.html" class="btn-primary" style="justify-content:center;">
+                    <span>🔐 Sign In with Admin Account</span>
+                </a>
+                <a href="homepage.html" class="btn-outline" style="justify-content:center;">
+                    <span>← Return to Public Gallery</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Content (Only visible to mkiruthika659@gmail.com) -->
+    <div class="admin-layout" id="adminContent" style="display: none;">
         <!-- Header -->
         <header class="admin-header">
             <div class="brand-wrap">
                 <img src="logo.png" alt="Just Art Logo" class="logo-img" onerror="this.style.display='none'" />
                 <div class="brand-title">Just Art</div>
                 <span class="brand-badge">Admin Studio</span>
+                <span id="adminEmailBadge" class="admin-user-pill">👤 mkiruthika659@gmail.com</span>
             </div>
             <div class="header-actions">
                 <a href="homepage.html" class="btn-outline" target="_blank">
@@ -254,6 +319,9 @@
                 <a href="gallerypage.html" class="btn-outline" target="_blank">
                     <span>🖼️ View Gallery</span>
                 </a>
+                <button type="button" id="adminSignOutBtn" class="btn-outline" style="color:var(--danger); border-color:#FECACA;">
+                    <span>🚪 Sign Out</span>
+                </button>
                 <a href="#addSection" class="btn-primary">
                     <span>＋ Add Painting</span>
                 </a>
@@ -413,11 +481,43 @@
     <div class="toast" id="toast"></div>
 
     <script type="module">
-        import { fetchPaintings, apiAddPainting, apiUpdatePainting, apiDeletePainting } from './db-common.js';
+        import { fetchPaintings, apiAddPainting, apiUpdatePainting, apiDeletePainting, watchAuth, isUserAdmin, logOut, ADMIN_EMAIL } from './db-common.js';
 
         let currentPaintings = [];
         let activeImageData = '';
         let editImageData = '';
+        let currentUser = null;
+
+        const authBarrier = document.getElementById('authBarrier');
+        const adminContent = document.getElementById('adminContent');
+        const adminEmailBadge = document.getElementById('adminEmailBadge');
+        const adminSignOutBtn = document.getElementById('adminSignOutBtn');
+
+        // Watch authentication state and enforce admin-only access
+        watchAuth((user) => {
+            currentUser = user;
+            if (user && isUserAdmin(user)) {
+                // User is authenticated admin
+                authBarrier.style.display = 'none';
+                adminContent.style.display = 'block';
+                if (adminEmailBadge) {
+                    adminEmailBadge.textContent = `👤 ${user.email}`;
+                }
+                loadCatalog();
+            } else {
+                // Not logged in or not admin
+                adminContent.style.display = 'none';
+                authBarrier.style.display = 'flex';
+            }
+        });
+
+        // Sign out button
+        if (adminSignOutBtn) {
+            adminSignOutBtn.addEventListener('click', async () => {
+                await logOut();
+                window.location.href = 'signin.html';
+            });
+        }
 
         // DOM Elements
         const statTotal = document.getElementById('statTotalPaintings');
@@ -699,9 +799,7 @@
 
         // Search listener
         catalogSearch.addEventListener('input', renderCatalog);
-
-        // Initial Load
-        loadCatalog();
     </script>
 </body>
 </html>
+

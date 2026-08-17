@@ -197,13 +197,23 @@
             signInForm.classList.remove('active');
         });
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTarget = urlParams.get('redirect');
+
+        function getPostLoginRedirect(user) {
+            if (redirectTarget && (redirectTarget.includes('admin') ? (user && user.email === 'mkiruthika659@gmail.com') : true)) {
+                return redirectTarget;
+            }
+            return 'homepage.html?login=success';
+        }
+
         // ------------------------------------------------------------
         // If someone is ALREADY signed in and lands on this page,
-        // send them straight back home instead of showing the form.
+        // send them to destination instead of showing the form.
         // ------------------------------------------------------------
         watchAuth((user) => {
             if (user) {
-                window.location.href = 'homepage.html?login=success';
+                window.location.href = getPostLoginRedirect(user);
             }
         });
 
@@ -224,8 +234,8 @@
             siBtn.textContent = 'Signing in…';
 
             try {
-                await signIn(email, password);   // <-- calls the function from db-common.js
-                window.location.href = 'homepage.html?login=success';
+                const user = await signIn(email, password);   // <-- calls the function from db-common.js
+                window.location.href = getPostLoginRedirect(user);
             } catch (err) {
                 siError.textContent = friendlyAuthError(err);
                 siError.style.display = 'block';
@@ -254,13 +264,13 @@
             suBtn.textContent = 'Creating account…';
 
             try {
-                await signUp(email, password);   // <-- calls the function from db-common.js
+                const user = await signUp(email, password);   // <-- calls the function from db-common.js
 
                 suSuccess.textContent = '✨ Account created! Redirecting…';
                 suSuccess.style.display = 'block';
 
                 setTimeout(() => {
-                    window.location.href = 'homepage.html?login=success';
+                    window.location.href = getPostLoginRedirect(user);
                 }, 900);
             } catch (err) {
                 suError.textContent = friendlyAuthError(err);
