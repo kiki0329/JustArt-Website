@@ -859,24 +859,31 @@
         }
 
         // ============================================================
+        //  DOM REFS
+        // ============================================================
+        const $ = id => document.getElementById(id);
+        const toastEl = $('toast');
+        const cartBadge = $('cartBadge');
+        const wishlistBadge = $('wishlistBadge');
+        const searchInput = $('searchInput');
+        const searchBtn = $('searchBtn');
+        const featuredGrid = $('featuredGrid');
+
+        function updateLoginButton() {
+            const btn = document.getElementById('loginNavBtn');
+            if (btn) {
+                btn.textContent = (currentUser && isLoggedIn) ? 'Sign Out' : 'Sign In';
+                btn.title = currentUser ? (currentUser.email || '') : '';
+            }
+        }
+
+        // ============================================================
         //  AUTH OBSERVER
         // ============================================================
         watchAuth(async (user) => {
             currentUser = user;
-            isLoggedIn = !!user;
+            isLoggedIn = Boolean(user);
             updateLoginButton();
-
-            const loginBtn = document.getElementById('loginNavBtn');
-            if (loginBtn) {
-                if (user) {
-                    loginBtn.textContent = 'Sign Out';
-                    loginBtn.dataset.loggedIn = 'true';
-                    loginBtn.title = user.email || '';
-                } else {
-                    loginBtn.textContent = 'Sign In';
-                    loginBtn.dataset.loggedIn = 'false';
-                }
-            }
 
             // Show Studio link ONLY if authenticated as admin (mkiruthika659@gmail.com)
             const adminNavSlot = document.getElementById('adminNavSlot');
@@ -892,13 +899,12 @@
             if (user) {
                 try {
                     const data = await loadUserData(user.uid, user.email);
-                    cart = data.cart;
-                    wishlist = data.wishlist;
+                    cart = data.cart || [];
+                    wishlist = data.wishlist || [];
                     saveState('justart_cart', cart);
                     saveState('justart_wishlist', wishlist);
                 } catch (e) {
                     console.error('MySQL load failed, using local cache', e);
-                    showToast('⚠️ Could not reach your saved data — using local cache.');
                 }
             } else {
                 cart = loadState('justart_cart', []);
@@ -910,22 +916,10 @@
         });
 
         // ============================================================
-        //  DOM REFS
-        // ============================================================
-        const $ = id => document.getElementById(id);
-        const toastEl = $('toast');
-        const cartBadge = $('cartBadge');
-        const wishlistBadge = $('wishlistBadge');
-        const loginBtn = $('loginNavBtn');
-        const searchInput = $('searchInput');
-        const searchBtn = $('searchBtn');
-        const featuredGrid = $('featuredGrid');
-        const categoriesGrid = $('categoriesGrid');
-
-        // ============================================================
         //  HELPERS
         // ============================================================
         function showToast(msg) {
+            if (!toastEl) return;
             toastEl.textContent = msg;
             toastEl.classList.add('show');
             clearTimeout(toastEl._timer);
@@ -938,10 +932,6 @@
 
         function getPainting(id) {
             return paintings.find(p => p.id === id);
-        }
-
-        function getCategoryCount(cat) {
-            return paintings.filter(p => p.category === cat).length;
         }
 
         function isInCart(id) { return cart.some(i => i.id === id); }
@@ -959,38 +949,13 @@
                 'Portrait': '👤',
                 'Abstract': '🌀',
                 'Expressionism': '🎭',
-                'Impressionism': '🌅',
-                'Surrealism': '🌙',
+                'Impressionism': '🎨',
+                'Surrealism': '🌌',
                 'Seascape': '🌊',
-                'Contemporary': '✨',
-                'Floral': '🌸'
+                'Floral': '🌸',
+                'Contemporary': '🏙️'
             };
             return map[cat] || '🎨';
-        }
-
-        function renderCategories() {
-            let html = `<div class="cat-card active" data-cat="all">
-                <span class="cat-icon">🖼️</span> All
-                <span style="font-size:12px;color:var(--secondary);display:block;">${paintings.length}</span>
-            </div>`;
-            categories.forEach(cat => {
-                html += `<div class="cat-card" data-cat="${cat}">
-                    <span class="cat-icon">${getCatIcon(cat)}</span> ${cat}
-                    <span style="font-size:12px;color:var(--secondary);display:block;">${getCategoryCount(cat)}</span>
-                </div>`;
-            });
-            categoriesGrid.innerHTML = html;
-
-            document.querySelectorAll('.cat-card').forEach(card => {
-                card.addEventListener('click', function () {
-                    const cat = this.dataset.cat;
-                    if (cat === 'all') {
-                        location.href = 'gallerypage.html';
-                    } else {
-                        location.href = `gallerypage.html?category=${encodeURIComponent(cat)}`;
-                    }
-                });
-            });
         }
 
         function renderProductCard(p) {
@@ -1000,13 +965,17 @@
                 <div class="product-card" data-id="${p.id}">
                     <div class="product-img">
                         <img src="${p.image}" alt="${p.title}" loading="lazy" />
-                        <button class="wishlist-toggle ${inWish ? 'liked' : ''}" data-id="${p.id}">${inWish ? '♥' : '♡'}</button>
+                        <button class="wishlist-toggle ${inWish ? 'liked' : ''}" data-id="${p.id}" aria-label="Toggle wishlist">
+                            ${inWish ? '♥' : '♡'}
+                        </button>
                     </div>
                     <div class="product-info">
                         <div class="title">${p.title}</div>
                         <div class="price-row">
                             <span class="price">${formatPrice(p.price)}</span>
-                            <button class="add-cart-btn ${inCart ? 'added' : ''}" data-id="${p.id}">${inCart ? '✓ In Cart' : '🛒 Add'}</button>
+                            <button class="add-cart-btn ${inCart ? 'added' : ''}" data-id="${p.id}">
+                                ${inCart ? '✓ In Cart' : '🛒 Add'}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1020,30 +989,30 @@
                 const adminLink = (currentUser && isUserAdmin(currentUser))
                     ? `<a href="admin.html" style="color: var(--accent); font-weight: 600; display:inline-block; margin-top:8px;">Go to Admin Studio to upload paintings →</a>`
                     : `<p style="font-size: 14px; margin-top: 4px;">Check back soon for new original artworks!</p>`;
-                featuredGrid.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px 0; color: #64748B;">
-                        <p style="font-size: 18px; margin-bottom: 4px;">🎨 No paintings uploaded yet</p>
-                        ${adminLink}
-                    </div>
-                `;
+                if (featuredGrid) {
+                    featuredGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px 0; color: #64748B;">
+                            <p style="font-size: 18px; margin-bottom: 4px;">🎨 No paintings uploaded yet</p>
+                            ${adminLink}
+                        </div>
+                    `;
+                }
                 return;
             }
-            featuredGrid.innerHTML = listToShow.map(p => renderProductCard(p)).join('');
+            if (featuredGrid) {
+                featuredGrid.innerHTML = listToShow.map(p => renderProductCard(p)).join('');
+            }
         }
 
         function updateBadges() {
-            cartBadge.textContent = getCartCount();
-            wishlistBadge.textContent = wishlist.length;
-        }
-
-        function updateLoginButton() {
-            loginBtn.textContent = isLoggedIn ? 'Sign Out' : 'Sign In';
+            if (cartBadge) cartBadge.textContent = getCartCount();
+            if (wishlistBadge) wishlistBadge.textContent = wishlist.length;
         }
 
         // ============================================================
         //  EVENT DELEGATION
         // ============================================================
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', async function (e) {
             // Wishlist toggle
             const wishBtn = e.target.closest('.wishlist-toggle');
             if (wishBtn) {
@@ -1062,16 +1031,14 @@
                 return;
             }
 
-            // Login/Logout — now checks user session auth state
-            // (set by the module script above via loginBtn.dataset.loggedIn)
+            // Login / Logout button
             if (e.target.id === 'loginNavBtn') {
-                const currentlyLoggedIn = e.target.dataset.loggedIn === 'true';
-                if (currentlyLoggedIn) {
-                    window.__signOut().then(() => {
-                        showToast('Signed out.');
-                    });
+                e.preventDefault();
+                if (isLoggedIn) {
+                    await logOut();
+                    showToast('Signed out successfully.');
                 } else {
-                    location.href = 'signin.html';
+                    window.location.href = 'signin.html';
                 }
                 return;
             }

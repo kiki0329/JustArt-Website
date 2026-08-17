@@ -27,6 +27,10 @@ try {
     }
 } catch (e) {}
 
+export function getCurrentUser() {
+    return cachedUser;
+}
+
 // Triggers callbacks registered by watchAuth
 function notifyListeners(user) {
     if (user) {

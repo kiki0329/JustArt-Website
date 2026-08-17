@@ -126,6 +126,8 @@
                     <p>sign in to your collection</p>
                 </div>
 
+                <div id="activeSessionBox"></div>
+
                 <div class="tab-switch">
                     <button id="tabSignIn" class="active">Sign In</button>
                     <button id="tabSignUp">Create Account</button>
@@ -171,10 +173,10 @@
 
     <!-- ============================================================
          DATABASE — uses the functions exported from db-common.js
-         (signIn / signUp / watchAuth) to interact with the backend API.
+         (signIn / signUp / watchAuth / logOut) to interact with the backend API.
        ============================================================ -->
     <script type="module">
-        import { signIn, signUp, watchAuth } from './db-common.js';
+        import { signIn, signUp, watchAuth, logOut, ADMIN_EMAIL } from './db-common.js';
 
         // ------------------------------------------------------------
         // TAB SWITCHING (Sign In <-> Create Account)
@@ -183,6 +185,7 @@
         const tabSignUp = document.getElementById('tabSignUp');
         const signInForm = document.getElementById('signInForm');
         const signUpForm = document.getElementById('signUpForm');
+        const activeSessionBox = document.getElementById('activeSessionBox');
 
         tabSignIn.addEventListener('click', () => {
             tabSignIn.classList.add('active');
@@ -201,19 +204,39 @@
         const redirectTarget = urlParams.get('redirect');
 
         function getPostLoginRedirect(user) {
-            if (redirectTarget && (redirectTarget.includes('admin') ? (user && user.email === 'mkiruthika659@gmail.com') : true)) {
+            const isAdmin = user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+            if (redirectTarget) {
+                if (redirectTarget.includes('admin')) {
+                    return isAdmin ? 'admin.html' : 'homepage.html?login=success';
+                }
                 return redirectTarget;
+            }
+            if (isAdmin) {
+                return 'admin.html';
             }
             return 'homepage.html?login=success';
         }
 
-        // ------------------------------------------------------------
-        // If someone is ALREADY signed in and lands on this page,
-        // send them to destination instead of showing the form.
-        // ------------------------------------------------------------
+        // Show active user badge without forcing redirect
         watchAuth((user) => {
-            if (user) {
-                window.location.href = getPostLoginRedirect(user);
+            if (user && activeSessionBox) {
+                activeSessionBox.innerHTML = `
+                    <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:10px; padding:12px 16px; margin-bottom:20px; font-size:13px; color:#1E40AF; text-align:center;">
+                        Currently signed in as <strong>${user.email}</strong>
+                        <div style="margin-top:8px; display:flex; justify-content:center; gap:16px;">
+                            <button id="quickSignOutBtn" type="button" style="color:#DC2626; font-weight:600; cursor:pointer; text-decoration:underline;">Sign Out</button>
+                            <a href="${getPostLoginRedirect(user)}" style="color:#2563EB; font-weight:600;">Continue &rarr;</a>
+                        </div>
+                    </div>
+                `;
+                const quickSignOutBtn = document.getElementById('quickSignOutBtn');
+                if (quickSignOutBtn) {
+                    quickSignOutBtn.addEventListener('click', async () => {
+                        await logOut();
+                    });
+                }
+            } else if (activeSessionBox) {
+                activeSessionBox.innerHTML = '';
             }
         });
 
@@ -234,7 +257,7 @@
             siBtn.textContent = 'Signing in…';
 
             try {
-                const user = await signIn(email, password);   // <-- calls the function from db-common.js
+                const user = await signIn(email, password);
                 window.location.href = getPostLoginRedirect(user);
             } catch (err) {
                 siError.textContent = friendlyAuthError(err);
@@ -246,7 +269,6 @@
 
         // ------------------------------------------------------------
         // CREATE ACCOUNT — new users
-        // (signUp() in db-common.js already creates the account)
         // ------------------------------------------------------------
         const suError = document.getElementById('suError');
         const suSuccess = document.getElementById('suSuccess');
@@ -264,14 +286,14 @@
             suBtn.textContent = 'Creating account…';
 
             try {
-                const user = await signUp(email, password);   // <-- calls the function from db-common.js
+                const user = await signUp(email, password);
 
                 suSuccess.textContent = '✨ Account created! Redirecting…';
                 suSuccess.style.display = 'block';
 
                 setTimeout(() => {
                     window.location.href = getPostLoginRedirect(user);
-                }, 900);
+                }, 800);
             } catch (err) {
                 suError.textContent = friendlyAuthError(err);
                 suError.style.display = 'block';

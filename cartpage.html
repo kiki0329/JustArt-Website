@@ -248,7 +248,11 @@
         }
 
         function updateLoginButton() {
-            loginBtn.textContent = isLoggedIn ? 'Sign Out' : 'Sign In';
+            const btn = document.getElementById('loginNavBtn');
+            if (btn) {
+                btn.textContent = (currentUser && isLoggedIn) ? 'Sign Out' : 'Sign In';
+                btn.title = currentUser ? (currentUser.email || '') : '';
+            }
         }
 
         document.addEventListener('click', async function(e) {
@@ -270,6 +274,20 @@
                 removeFromCart(id);
                 return;
             }
+            if (e.target.id === 'clearCartBtn') {
+                cart = [];
+                saveState('justart_cart', cart);
+                if (currentUser) {
+                    try {
+                        await apiClearCart();
+                    } catch (e) {
+                        console.error('MySQL clear failed', e);
+                    }
+                }
+                renderCart();
+                updateBadges();
+                return;
+            }
             if (e.target.id === 'checkoutBtn') {
                 if (cart.length === 0) { showToast('Your cart is empty.'); return; }
                 showToast('🎉 Order placed! Thank you for your purchase.');
@@ -287,10 +305,12 @@
                 return;
             }
             if (e.target.id === 'loginNavBtn') {
+                e.preventDefault();
                 if (isLoggedIn) {
-                    logOut().then(() => showToast('Signed out.'));
+                    await logOut();
+                    showToast('Signed out successfully.');
                 } else {
-                    location.href = 'signin.html';
+                    window.location.href = 'signin.html';
                 }
                 return;
             }

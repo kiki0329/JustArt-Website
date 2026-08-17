@@ -235,10 +235,14 @@
         }
 
         function updateLoginButton() {
-            loginBtn.textContent = isLoggedIn ? 'Sign Out' : 'Sign In';
+            const btn = document.getElementById('loginNavBtn');
+            if (btn) {
+                btn.textContent = (currentUser && isLoggedIn) ? 'Sign Out' : 'Sign In';
+                btn.title = currentUser ? (currentUser.email || '') : '';
+            }
         }
 
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', async function(e) {
             const wiCart = e.target.closest('.wi-cart');
             if (wiCart) {
                 const id = parseInt(wiCart.dataset.id);
@@ -252,10 +256,12 @@
                 return;
             }
             if (e.target.id === 'loginNavBtn') {
+                e.preventDefault();
                 if (isLoggedIn) {
-                    logOut().then(() => showToast('Signed out.'));
+                    await logOut();
+                    showToast('Signed out successfully.');
                 } else {
-                    location.href = 'signin.html';
+                    window.location.href = 'signin.html';
                 }
                 return;
             }
